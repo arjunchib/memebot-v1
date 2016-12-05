@@ -1,0 +1,32 @@
+{
+  "name": "memebot",
+  "version": "1.0.0",
+  "description": "A Discord bot for memes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arjunchib/memebot.git"
+  },
+  "keywords": [
+    "Discord",
+    "memes",
+    "caveman",
+    "harambe",
+    "dank"
+  ],
+  "author": "Arjun Chib",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arjunchib/memebot/issues"
+  },
+  "homepage": "https://github.com/arjunchib/memebot#readme",
+  "dependencies": {
+    "discord.js": "^9.3.0",
+    "fluent-ffmpeg": "^2.1.0",
+    "pushover-notifications": "^0.2.3",
+    "ytdl-core": "^0.7.18"
+  }
+}
