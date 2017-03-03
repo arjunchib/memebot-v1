@@ -2,26 +2,28 @@ var Discord = require('discord.js');
 var fs = require('fs');
 var ytdl = require('ytdl-core');
 var ffmpeg = require('fluent-ffmpeg')
-var push = require( 'pushover-notifications' );
+// var push = require( 'pushover-notifications' );
 
-var DISCORD_TOKEN = 'YOUR API TOKEN';
-var PUSHOVER_USER = 'YOUR API TOKEN';
-var PUSHOVER_TOKEN = 'YOUR API TOKEN';
+var DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+// var PUSHOVER_USER = process.env.PUSHOVER_USER;
+// var PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN;
 
 var client = new Discord.Client();
 var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'));
 var debugMode = true;
 var isPlaying = false;
+var reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn'];
+var blockedFile = null;
 
 // PUSH NOTIFICATIONS
 
-var p = new push( {
-    user: PUSHOVER_USER,
-    token: PUSHOVER_TOKEN,
-    onerror: function(error) {
-      console.log(error);
-    }
-});
+// var p = new push( {
+//     user: PUSHOVER_USER,
+//     token: PUSHOVER_TOKEN,
+//     onerror: function(error) {
+//       console.log(error);
+//     }
+// });
 
 // MAIN LOOP
 
@@ -34,6 +36,7 @@ client.on('message', message => {
     if (message == null || message.content.substring(0,1) !== '!' || message.content.length <= 1) {
       return;
     }
+    message.content = trimWhitespace(message.content);
     var words = message.content.substring(1).split(' ');
     command = words[0].toLowerCase();
     if (command === 'add') {
@@ -86,11 +89,20 @@ function add(message, words) {
     commands.push(words[i].replace(',', ''));
   }
 
+  for (var i = 0; i < commands.length; i++) {
+    for (var j = 0; j < reservedWords.length; j++) {
+      if (commands[i].toLowerCase() === reservedWords[j].toLowerCase()) {
+        message.channel.sendMessage('The command **' + commadns[i] + '** is a reserved word. Please use a different name.');
+        debug(message.author.username + ' tried to add the ' + commands[i] + ' command which is a reserved word')
+      }
+    }
+  }
+
   for (var i = 0; i < memes.length; i++) {
     for (var j = 0; j < memes[i]['commands'].length; j++) {
       for (var k = 0; k < commands.length; k++) {
         if (memes[i]['commands'][j].toLowerCase() === commands[k].toLowerCase()) {
-          message.channel.sendMessage("This command already exists! Please delete it first.");
+          message.channel.sendMessage('The command **' + commands[k] + '** already exists! Please delete it first.');
           debug(message.author.username + ' tried to add the ' + commands[k] + ' command which already exists')
           return;
         }
@@ -101,18 +113,23 @@ function add(message, words) {
   var endSeekOption = '-to ' + endTime;
   var filePath = makeFilePath('audio/', commands[0], '.mp3');
 
-  try {
-    ffmpeg(stream)
-    .noVideo()
-    .seekOutput(startTime)
-    .format('mp3')
-    .outputOptions(['-write_xing 0', endSeekOption])
-    .save(filePath);
-  } catch(err) {
-    console.log(err);
-  }
+  blockedFile = commands[0] + '.mp3';
+  ffmpeg(stream)
+  .noVideo()
+  .seekOutput(startTime)
+  .format('mp3')
+  .outputOptions(['-write_xing 0', endSeekOption])
+  .save(filePath)
+  .on('error', function(err, stdout, stderr) {
+    console.log('Cannot process video: ' + err.message);
+    debug(message.author.username + ' induced an ffmpeg error');
+  })
+  .on('end', function(err, stdout, stderr) {
+    blockedFile = null;
+  });
 
-  var meme = {name: commands[0], commands: commands, file: filePath.substring(6), audioModifier: 1, playCount: 0};
+  var d = new Date()
+  var meme = {name: commands[0], commands: commands, file: filePath.substring(6), dateAdded: d.toJSON(), audioModifier: 1, playCount: 0};
   memes.push(meme);
   saveMemes();
   message.channel.sendMessage('Added ' + commands[0]);
@@ -135,7 +152,6 @@ function remove(message, words) {
     fs.unlinkSync('audio/' + file);
   } catch (err) {
     console.log(err);
-    message.channel.sendMessage("Error!");
   }
   message.channel.sendMessage('Deleted ' + words[1]);
   debug(message.author.username + ' deleted ' + file)
@@ -180,9 +196,22 @@ function info(message, words) {
     output += meme['commands'][i] + ', ';
   }
   output = output.substring(0, output.length - 2);
+  var d = new Date(meme['dateAdded']);
+  output += '\ndate added: ' + d.toDateString();
   output += '\naudio modifier: ' + meme['audioModifier'];
   output += '\nplay count: ' + meme['playCount'] + '```';
   message.channel.sendMessage(output);
+}
+
+// RANDOM
+
+function random(message, words) {
+  if (message.member.voiceChannel == null) {
+    message.channel.sendMessage('You must join a voice channel to play the dank memes');
+    return;
+  }
+  var randomIndex = Math.floor(Math.random() * memes.length);
+  playFile(memes[randomIndex]['file'], message.member.voiceChannel);
 }
 
 // PLAY
@@ -212,7 +241,7 @@ function play(message, words) {
 }
 
 function playFile(file, voiceChannel) {
-  if (!isPlaying) {
+  if (!isPlaying && file !== blockedFile) {
     isPlaying = true;
     voiceChannel.join()
       .then(connection => {
@@ -236,6 +265,10 @@ function displayErrorText(message) {
   message.channel.sendMessage(errorText);
 }
 
+function trimWhitespace(str) {
+  return str.replace(/\s+/g,' ').trim();
+}
+
 function findMemberTagByID(member_id) {
   for (var i = 0; i < tags.length; i++) {
     var member = tags[i];
@@ -246,6 +279,9 @@ function findMemberTagByID(member_id) {
 }
 
 function findIndexByCommand(inputCommand) {
+  if (!inputCommand) {
+    return -1;
+  }
   for (var i = 0; i < memes.length; i++) {
     var meme = memes[i];
     for (var j = 0; j < meme['commands'].length; j++) {

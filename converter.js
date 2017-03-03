@@ -2,11 +2,11 @@ var fs = require('fs');
 
 var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'));
 
+var d = new Date(0);
 for (var i = 0; i < memes.length; i++) {
-  // memes[i]['audioModifier'] = 1
-  // modify memes
+  // memes[i]['dateAdded'] = d.toJSON();
 }
-saveMemes();
+// saveMemes();
 
 function compareMemes(a, b) {
   return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase());

@@ -27,6 +27,6 @@
     "discord.js": "^9.3.0",
     "fluent-ffmpeg": "^2.1.0",
     "pushover-notifications": "^0.2.3",
-    "ytdl-core": "^0.7.18"
+    "ytdl-core": "^0.7.24"
   }
 }
