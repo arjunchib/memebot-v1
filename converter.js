@@ -4,9 +4,11 @@ var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'));
 
 var d = new Date(0);
 for (var i = 0; i < memes.length; i++) {
-  // memes[i]['dateAdded'] = d.toJSON();
+  memes[i]['lastPlayed'] = d.toJSON();
+  memes[i]['author_id'] = '';
+  memes[i]['author'] = 'Unknown';
 }
-// saveMemes();
+saveMemes();
 
 function compareMemes(a, b) {
   return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase());
@@ -14,5 +16,5 @@ function compareMemes(a, b) {
 
 function saveMemes() {
   memes.sort(compareMemes);
-  fs.writeFileSync('memes.json', JSON.stringify(memes, null, 2));
+  fs.writeFileSync('memes_converted.json', JSON.stringify(memes, null, 2));
 }
