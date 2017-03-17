@@ -89,7 +89,6 @@ function add(message, words) {
       "votes": {}
     }
     citizens.push(citizen);
-    console.log(citizens);
     saveCitizens();
   }
 
@@ -201,7 +200,7 @@ function list(message, words) {
 // HELP
 function help(message) {
   var helpText =
-  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list\nA list of all meme names.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!vote [meme] [yea/nay]\nAllows you to vote for a memes deletion. Yea votes to delete, while nay votes to keep (alternatively you can use remove/keep). You must have added a meme to vote on meme deletions. The meme will be deleted once it has recieved over 50% approval for its deletion.\n\n!help \nThis message.```';
+  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [order]\nA list of all meme names by most played. Order by "mos" or "least".\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!vote [meme] [yea/nay]\nAllows you to vote for a memes deletion. Yea votes to delete, while nay votes to keep (alternatively you can use remove/keep). You must have added a meme to vote on meme deletions. The meme will be deleted once it has recieved over 50% approval for its deletion.\n\n!help \nThis message.```';
   message.channel.sendMessage(helpText);
 }
 
