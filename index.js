@@ -6,24 +6,27 @@ var push = require( 'pushover-notifications' );
 
 var DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 var PUSHOVER_USER = process.env.PUSHOVER_USER;
-// var PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN;
+var PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN;
 
 var client = new Discord.Client();
 var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'));
 var citizens = JSON.parse(fs.readFileSync('citizens.json', 'utf8'));
 var debugMode = true;
 var isPlaying = false;
-var reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote'];
+var reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize'];
 var blockedFile = null;
+var pushover;
 
 // PUSH NOTIFICATIONS
-// var p = new push( {
-//     user: PUSHOVER_USER,
-//     token: PUSHOVER_TOKEN,
-//     onerror: function(error) {
-//       console.log(error);
-//     }
-// });
+if (PUSHOVER_USER && PUSHOVER_TOKEN) {
+  pushover = new push( {
+      user: PUSHOVER_USER,
+      token: PUSHOVER_TOKEN,
+      onerror: function(error) {
+        console.log(error);
+      }
+  });
+}
 
 // MAIN LOOP
 client.on('ready', () => {
@@ -39,38 +42,42 @@ client.on('message', message => {
     var words = message.content.substring(1).split(' ');
     command = words[0].toLowerCase();
     if (command === 'add') {
-      add(message, words)
+      add(message, words);
     } else if (command === 'delete') {
-      remove(message, words)
+      remove(message, words);
     } else if (command === 'list') {
-      list(message, words)
+      list(message, words);
     } else if (command === 'help') {
-      help(message)
+      help(message);
     } else if (command === 'random') {
-      random(message, words)
+      random(message, words);
     } else if (command === 'info') {
-      info(message, words)
+      info(message, words);
+    } else if (command === 'naturalize') {
+      naturalize(message, words);
     } else if (command === 'vote') {
-      vote(message, words)
+      vote(message, words);
     } else if (command === 'airhorn') {
-      //pass
+      return;
     } else {
-      play(message, words)
+      play(message, words);
     }
   } catch(err) {
     console.log(err);
-    var msg = {
-      message: 'Memebot has fallen and can\'t get up',   // required
-      title: "Memebot",
-      sound: 'gamelan',
-      device: 'iphone',
-      priority: 1
-    };
-    p.send(msg, function(err, result) {
-      if (err) throw err;
-      console.log(result);
-      process.exit(0);
-    });
+    if (pushover) {
+      var msg = {
+        message: 'Memebot has fallen and can\'t get up',   // required
+        title: "Memebot",
+        sound: 'gamelan',
+        device: 'iphone',
+        priority: 1
+      };
+      pushover.send(msg, function(err, result) {
+        if (err) throw err;
+        console.log(result);
+        process.exit(0);
+      });
+    }
   }
 });
 
@@ -79,17 +86,6 @@ function add(message, words) {
   if (words.length < 5) {
     displayErrorText(message);
     return;
-  }
-
-  citizen = findCitizenByID(message.author.id)
-  if (citizen == null) {
-    citizen = {
-      "name": message.author.username,
-      "id": message.author.id,
-      "votes": {}
-    }
-    citizens.push(citizen);
-    saveCitizens();
   }
 
   var stream = ytdl(words[1]);
@@ -166,7 +162,8 @@ function remove(message, words) {
     displayErrorText(message);
     return;
   }
-  if (memes[index]['author_id'] == message.author.id) {
+  if (memes[index]['author_id'] == message.author.id ||
+  message.author.id == 135936099011788800) {
     deleteMemeByIndex(index)
     message.channel.sendMessage('Deleted ' + words[1]);
   } else {
@@ -177,30 +174,70 @@ function remove(message, words) {
 // LIST
 function list(message, words) {
   var names = '```';
+  var list = [];
   var count = names.length;
-  if (words.length > 1 && words[1] == 'least') {
-    memes.sort(compareMemesLeastRecent);
+  var isAll = false;
+  var isArchived = false;
+  var isVoting = false;
+
+  if (words.length > 1) {
+    if (words[1] == 'least') {
+      memes.sort(compareMemesLeastRecent);
+    } else if (words[1] == 'most') {
+      memes.sort(compareMemesMostRecent);
+    } else if (words[1] == 'all') {
+      isAll = true;
+    } else if (words[1] == 'archived' || words[1] == 'archives' || words[1] == 'archive') {
+      isArchived = true;
+    } else if (words[1] == 'vote' || words[1] == 'voting' || words[1] == 'votes') {
+      isVoting = true;
+    } else {
+      displayErrorText(message);
+      return;
+    }
   } else {
     memes.sort(compareMemesMostRecent);
   }
-  for (var i = 0; i < memes.length; i++) {
-    memeName = memes[i]['name'];
+
+  if (!isVoting) {
+    for (var i = 0; i < memes.length; i++) {
+      if (isAll || isArchived === memes[i]['archived']) {
+        list.push(memes[i]['name']);
+      }
+    }
+  } else {
+    for (var i = 0; i < citizens.length; i++) {
+      for (var vote in citizens[i]['votes']) {
+        list.push(vote);
+      }
+    }
+    list = removeDuplicates(list);
+  }
+
+  for (var i = 0; i < list.length; i++) {
+    memeName = list[i];
     if (names.length + memeName.length + 2 <= 1999) {
       names += memeName;
       names += ', ';
     }
   }
+
   if (names.length > 1999) {
     names = names.substring(0, 1999);
   }
-  names = names.substring(0, names.length - 2) + '```'
+  if (names.length > 3) {
+    names = names.substring(0, names.length - 2) + '```';
+  } else {
+    names = '```No memes :\'(```';
+  }
+
   message.channel.sendMessage(names);
 }
 
 // HELP
 function help(message) {
   var helpText =
-  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [order]\nA list of all meme names by most played. Order by "mos" or "least".\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!vote [meme] [yea/nay]\nAllows you to vote for a memes deletion. Yea votes to delete, while nay votes to keep (alternatively you can use remove/keep). You must have added a meme to vote on meme deletions. The meme will be deleted once it has recieved over 50% approval for its deletion.\n\n!help \nThis message.```';
+  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/archives/votes/all]\nA list of memes. If no modifer is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```';
   message.channel.sendMessage(helpText);
 }
 
@@ -213,7 +250,7 @@ function info(message, words) {
   }
   var index = findIndexByCommand(memeInput);
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[0]);
+    message.channel.sendMessage('Could not find meme by name: ' + words[1]);
     return;
   }
   var meme = memes[index];
@@ -224,11 +261,13 @@ function info(message, words) {
   output = output.substring(0, output.length - 2);
   var dateLastPlayed = new Date(meme['lastPlayed']);
   var dateAdded = new Date(meme['dateAdded']);
+  var status = meme['archived'] ? 'archived' : 'active';
   output += '\nauthor: ' + meme['author'];
   output += '\nlast played: ' + dateLastPlayed.toString();
   output += '\ndate added: ' + dateAdded.toDateString();
   output += '\naudio modifier: ' + meme['audioModifier'];
-  output += '\nplay count: ' + meme['playCount'] + '```';
+  output += '\nplay count: ' + meme['playCount'];
+  output += '\nstatus: ' + status + '```';
   message.channel.sendMessage(output);
 }
 
@@ -242,6 +281,23 @@ function random(message, words) {
   playFile(memes[randomIndex]['file'], message.member.voiceChannel);
 }
 
+// NATURALIZE
+function naturalize(message, words) {
+  var citizen = findCitizenByID(message.author.id)
+  if (citizen == null) {
+    citizen = {
+      "name": message.author.username,
+      "id": message.author.id,
+      "votes": {}
+    }
+    citizens.push(citizen);
+    saveCitizens();
+    message.channel.sendMessage("Welcome, " + message.author.username + " to the Council of Memes. May dankness guide your way.");
+  } else {
+    message.channel.sendMessage("You are already on the meme council you pleb");
+  }
+}
+
 // VOTE
 function vote(message, words) {
   if (words.length < 2) {
@@ -249,55 +305,89 @@ function vote(message, words) {
     return;
   }
 
-  index = findIndexByCommand(words[1]);
+  var index = findIndexByCommand(words[1]);
   if (index === -1) {
     message.channel.sendMessage('Could not find meme by name: ' + words[1]);
     displayErrorText(message);
     return;
   }
 
-  citizen = findCitizenByID(message.author.id)
+  var citizen = findCitizenByID(message.author.id)
   if (citizen == null) {
-    message.channel.sendMessage('You must have added a meme to become a citizen of memebotopia');
+    message.channel.sendMessage('You must naturalize to become a citizen of memebotopia');
     displayErrorText(message);
     return;
   }
 
-  memeName = memes[index]['name']
-  if (words[2] == 'yea' || words[2] == 'remove') {
-    citizen['votes'][memeName] = true;
-  } else if (words[2] == 'nay' || words[2] == 'keep') {
-    citizen['votes'][memeName] = false;
+  var memeName = memes[index]['name'];
+  var memeArchived = memes[index]['archived'];
+  if (words[2] === 'for' || words[2] === 'yea') {
+    if (memeArchived) {
+      citizen['votes'][memeName] = 'keep';
+    } else {
+      citizen['votes'][memeName] = 'remove';
+    }
+  } else if (words[2] === 'against' || words[2] === 'nay') {
+    if (!memeArchived) {
+      citizen['votes'][memeName] = 'keep';
+    } else {
+      citizen['votes'][memeName] = 'remove';
+    }
+  } else if (words[2] === 'keep') {
+    citizen['votes'][memeName] = 'keep';
+  } else if (words[2] === 'remove') {
+    citizen['votes'][memeName] = 'remove';
+  } else if (words[2] === 'abstain') {
+    citizen['votes'][memeName] = 'abstain';
   }
 
-  resolution = '**Resolution to remove "' + memeName + '" and restore memebotopia to its former glory.**\n\n';
+  var resolution = '';
+  if (memeArchived) {
+    resolution += '**Resolution to revive** ***' + memeName + '*** **and restore memebotopia to its former glory.**\n\n';
+  } else {
+    resolution += '**Resolution to remove** ***' + memeName + '*** **and restore memebotopia to its former glory.**\n\n';
+  }
 
-  yeas = 0;
-  nays = 0;
+  var yeas = 0;
+  var nays = 0;
+  var abstains = 0;
+  var noVotes = 0;
   for (var i = 0; i < citizens.length; i++) {
-    if (citizens[i]['votes'][memeName] === true) {
+    var vote = citizens[i]['votes'][memeName];
+    if (vote === 'keep' && memeArchived || vote === 'remove' && !memeArchived) {
       yeas += 1;
-    } else if (citizens[i]['votes'][memeName] === false) {
+    } else if (vote === 'keep' && !memeArchived || vote === 'remove' && memeArchived) {
       nays += 1;
+    } else if (vote === 'abstain') {
+      abstains += 1;
+    } else {
+      noVotes += 1;
     }
   }
 
-  resolution += (yeas + ' yea(s)\n');
-  resolution += (nays + ' nay(s)');
+  resolution += ('yea: ' + yeas + '\n');
+  resolution += ('nay: ' + nays + '\n');
+  resolution += ('abstain: ' + abstains + '\n');
+  resolution += ('no vote: ' + noVotes + '\n');
 
   if (nays >= citizens.length / 2) {
-    resolution += '\n\n The neas have it! The resolution is strcuk down.';
+    resolution += '\nThe neas have it! The resolution is struck down.';
     clearVotes(memeName);
   } else if (yeas > citizens.length / 2) {
-    resolution += '\n\n The ayes have it! The resolution is passed. The meme ' + memeName + ' has been deleted.';
-    deleteMemeByIndex(index);
+    resolution += '\nThe ayes have it! The resolution is passed.';
+    memes[index]['archived'] = !memeArchived;
+    saveMemes();
+    var result = memeArchived ? 'unarchived' : 'archived'
+    var resultUpper = memeArchived ? 'Unarchived' : 'Archived'
+    resolution += ' The meme, ' + memeName + ', has been ' + result + '.';
+    debug(resultUpper + ' ' + memeName);
     clearVotes(memeName);
   } else if (yeas + nays >= citizens.length) {
-    resolution += '\n\n Gridlock! The resolution dies.';
+    resolution += '\nGridlock! The resolution dies.';
     clearVotes(memeName);
   } else {
-    var votesNeeded = (citizens.length / 2) + 1 - yeas;
-    resolution += '\n\n ' + votesNeeded + ' more yea(s) needed to pass this resolution.';
+    var votesNeeded = (Math.floor(citizens.length / 2)) + 1 - yeas;
+    resolution += '\n' + votesNeeded + ' more yea(s) needed to pass this resolution.';
   }
 
   saveCitizens()
@@ -321,6 +411,10 @@ function play(message, words) {
   var index = findIndexByCommand(memeInput);
   if (index === -1) {
     message.channel.sendMessage('Could not find meme by name: ' + words[0]);
+    return;
+  }
+  if (memes[index]['archived']) {
+    message.channel.sendMessage('Cannot play archived meme: ' + words[0]);
     return;
   }
   var file = memes[index]['file'];
@@ -435,6 +529,12 @@ function compareCitizens(a, b) {
   return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase());
 }
 
+function removeDuplicates(a) {
+  return a.sort().filter(function(item, pos, ary) {
+    return !pos || item != ary[pos - 1];
+  })
+}
+
 function saveMemes() {
   memes.sort(compareMemes);
   fs.writeFileSync('memes.json', JSON.stringify(memes, null, 2));
@@ -454,9 +554,9 @@ function debug(msg) {
   var timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds());
   msg = '[' + timeString + '] ' + msg + '\n';
   fs.appendFile('debug.log', msg, function(err) {
-      if(err) {
-          return console.log(err);
-      }
+    if(err) {
+      return console.log(err);
+    }
   });
 }
 

@@ -4,7 +4,9 @@ var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'));
 
 var d = new Date(0);
 for (var i = 0; i < memes.length; i++) {
-  memes[i]['archived'] = false;
+  memes[i]['lastPlayed'] = d.toJSON();
+  memes[i]['author_id'] = '';
+  memes[i]['author'] = 'Unknown';
 }
 saveMemes();
 

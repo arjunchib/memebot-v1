@@ -1,1 +1,55 @@
-[]
+[
+  {
+    "name": "arjohn cena",
+    "id": "135936099011788800",
+    "votes": {
+      "Goldbond": "remove",
+      "StayingAlive": "remove"
+    }
+  },
+  {
+    "name": "Bourneidentity8",
+    "id": "200413362008489989",
+    "votes": {}
+  },
+  {
+    "name": "Crashbandicunt",
+    "id": "212391311142158337",
+    "votes": {}
+  },
+  {
+    "name": "flyingkitty",
+    "id": "138813284773003264",
+    "votes": {}
+  },
+  {
+    "name": "martel",
+    "id": "136634823824375808",
+    "votes": {
+      "Goldbond": "remove"
+    }
+  },
+  {
+    "name": "SpicySultanZ",
+    "id": "135937763429056513",
+    "votes": {
+      "Goldbond": "remove",
+      "enemies": "remove",
+      "choke": "remove",
+      "Hasa": "remove",
+      "youngmetro": "remove",
+      "sand": "remove",
+      "toshi": "remove",
+      "booty": "remove",
+      "ppap": "remove",
+      "ohhimark": "remove",
+      "shremix": "remove",
+      "StayingAlive": "remove"
+    }
+  },
+  {
+    "name": "thebluepumpkin",
+    "id": "125288896383811584",
+    "votes": {}
+  }
+]
