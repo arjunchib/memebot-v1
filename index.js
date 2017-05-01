@@ -280,7 +280,7 @@ function random (message, words) {
     message.channel.sendMessage('You must join a voice channel to play the dank memes')
     return
   }
-  var randomIndex = Math.floor(Math.random() * memes.length)
+  let randomIndex = Math.floor(Math.random() * memes.length)
   if (memes[randomIndex]['archived']) {
     random(message, words)
   } else {
@@ -290,7 +290,7 @@ function random (message, words) {
 
 // NATURALIZE
 function naturalize (message, words) {
-  var citizen = findCitizenByID(message.author.id)
+  let citizen = findCitizenByID(message.author.id)
   if (citizen == null) {
     citizen = {
       name: message.author.username,
@@ -312,22 +312,22 @@ function vote (message, words) {
     return
   }
 
-  var index = findIndexByCommand(words[1])
+  let index = findIndexByCommand(words[1])
   if (index === -1) {
     message.channel.sendMessage('Could not find meme by name: ' + words[1])
     displayErrorText(message)
     return
   }
 
-  var citizen = findCitizenByID(message.author.id)
+  let citizen = findCitizenByID(message.author.id)
   if (citizen == null) {
     message.channel.sendMessage('You must naturalize to become a citizen of memebotopia')
     displayErrorText(message)
     return
   }
 
-  var memeName = memes[index]['name']
-  var memeArchived = memes[index]['archived']
+  let memeName = memes[index]['name']
+  let memeArchived = memes[index]['archived']
   if (words[2] === 'for' || words[2] === 'yea') {
     if (memeArchived) {
       citizen['votes'][memeName] = 'keep'
@@ -348,19 +348,19 @@ function vote (message, words) {
     citizen['votes'][memeName] = 'abstain'
   }
 
-  var resolution = ''
+  let resolution = ''
   if (memeArchived) {
     resolution += '**Resolution to revive** ***' + memeName + '*** **and restore memebotopia to its former glory.**\n\n'
   } else {
     resolution += '**Resolution to remove** ***' + memeName + '*** **and restore memebotopia to its former glory.**\n\n'
   }
 
-  var yeas = 0
-  var nays = 0
-  var abstains = 0
-  var noVotes = 0
-  for (var i = 0; i < citizens.length; i++) {
-    var vote = citizens[i]['votes'][memeName]
+  let yeas = 0
+  let nays = 0
+  let abstains = 0
+  let noVotes = 0
+  for (let i = 0; i < citizens.length; i++) {
+    let vote = citizens[i]['votes'][memeName]
     if ((vote === 'keep' && memeArchived) || (vote === 'remove' && !memeArchived)) {
       yeas += 1
     } else if ((vote === 'keep' && !memeArchived) || (vote === 'remove' && memeArchived)) {
@@ -384,8 +384,8 @@ function vote (message, words) {
     resolution += '\nThe ayes have it! The resolution is passed.'
     memes[index]['archived'] = !memeArchived
     saveMemes()
-    var result = memeArchived ? 'unarchived' : 'archived'
-    var resultUpper = memeArchived ? 'Unarchived' : 'Archived'
+    let result = memeArchived ? 'unarchived' : 'archived'
+    let resultUpper = memeArchived ? 'Unarchived' : 'Archived'
     resolution += ' The meme, ' + memeName + ', has been ' + result + '.'
     debug(resultUpper + ' ' + memeName)
     clearVotes(memeName)
@@ -393,7 +393,7 @@ function vote (message, words) {
     resolution += '\nGridlock! The resolution dies.'
     clearVotes(memeName)
   } else {
-    var votesNeeded = (Math.floor(citizens.length / 2)) + 1 - yeas
+    let votesNeeded = (Math.floor(citizens.length / 2)) + 1 - yeas
     resolution += '\n' + votesNeeded + ' more yea(s) needed to pass this resolution.'
   }
 
@@ -407,7 +407,7 @@ function play (message, words) {
     message.channel.sendMessage('You must join a voice channel to play the dank memes')
     return
   }
-  var memeInput = words[0]
+  let memeInput = words[0]
   if (words[0].length === 0 && words.length > 1) {
     memeInput = words[1]
   }
@@ -415,7 +415,7 @@ function play (message, words) {
     displayErrorText(message)
     return
   }
-  var index = findIndexByCommand(memeInput)
+  let index = findIndexByCommand(memeInput)
   if (index === -1) {
     message.channel.sendMessage('Could not find meme by name: ' + words[0])
     return
@@ -424,9 +424,9 @@ function play (message, words) {
     message.channel.sendMessage('Cannot play archived meme: ' + words[0])
     return
   }
-  var file = memes[index]['file']
+  let file = memes[index]['file']
   playFile(file, message.member.voiceChannel)
-  var d = new Date()
+  let d = new Date()
   memes[index]['lastPlayed'] = d.toJSON()
   memes[index]['playCount'] += 1
   saveMemes()
@@ -451,7 +451,7 @@ function playFile (file, voiceChannel) {
 
 // HELPERS
 function displayErrorText (message) {
-  var errorText =
+  let errorText =
   'You did something wrong.\nType **!help** my adult son.'
   message.channel.sendMessage(errorText)
 }
@@ -464,10 +464,10 @@ function findIndexByCommand (inputCommand) {
   if (!inputCommand) {
     return -1
   }
-  for (var i = 0; i < memes.length; i++) {
-    var meme = memes[i]
-    for (var j = 0; j < meme['commands'].length; j++) {
-      var command = meme['commands'][j]
+  for (let i = 0; i < memes.length; i++) {
+    let meme = memes[i]
+    for (let j = 0; j < meme['commands'].length; j++) {
+      let command = meme['commands'][j]
       if (inputCommand.toLowerCase() === command.toLowerCase()) {
         return i
       }
@@ -477,7 +477,7 @@ function findIndexByCommand (inputCommand) {
 }
 
 function findCitizenByID (authorId) {
-  for (var i = 0; i < citizens.length; i++) {
+  for (let i = 0; i < citizens.length; i++) {
     if (citizens[i]['id'] === authorId) {
       return citizens[i]
     }
@@ -486,7 +486,7 @@ function findCitizenByID (authorId) {
 }
 
 function makeFilePath (path, fileName, extension) {
-  var number = 0
+  let number = 0
   while (fs.existsSync(path + makeFileName(fileName, number) + extension)) {
     number++
   }
@@ -502,7 +502,7 @@ function makeFileName (fileName, number) {
 }
 
 function deleteMemeByIndex (index) {
-  var file = memes[index]['file']
+  let file = memes[index]['file']
   memes.splice(index, 1)
   saveMemes()
   try {
@@ -514,7 +514,7 @@ function deleteMemeByIndex (index) {
 }
 
 function clearVotes (memeName) {
-  for (var i = 0; i < citizens.length; i++) {
+  for (let i = 0; i < citizens.length; i++) {
     delete citizens[i]['votes'][memeName]
   }
   saveCitizens()
@@ -557,8 +557,8 @@ function debug (msg) {
   if (debugMode) {
     console.log(msg)
   }
-  var d = new Date()
-  var timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
+  let d = new Date()
+  let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
   msg = '[' + timeString + '] ' + msg + '\n'
   fs.appendFile('debug.log', msg, function (err) {
     if (err) {

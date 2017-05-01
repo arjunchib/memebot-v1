@@ -1359,12 +1359,12 @@
     "file": "Hello.mp3",
     "name": "Hello",
     "audioModifier": 1,
-    "playCount": 22,
+    "playCount": 23,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-28T08:45:09.820Z",
+    "lastPlayed": "2017-05-01T19:27:59.589Z",
     "author_id": "",
     "author": "Unknown",
-    "archived": false
+    "archived": true
   },
   {
     "commands": [
