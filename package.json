@@ -30,7 +30,10 @@
     "pushover-notifications": "^0.2.3",
     "ytdl-core": "^0.7.24"
   },
-  "engines" : {
-    "node" : ">=6"
+  "engines": {
+    "node": ">=6"
+  },
+  "devDependencies": {
+    "standard": "^10.0.2"
   }
 }

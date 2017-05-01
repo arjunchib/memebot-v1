@@ -1,143 +1,147 @@
-var Discord = require('discord.js');
-var fs = require('fs');
-var ytdl = require('ytdl-core');
+var Discord = require('discord.js')
+var fs = require('fs')
+var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
-var push = require( 'pushover-notifications' );
+var push = require('pushover-notifications')
 
-var DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-var PUSHOVER_USER = process.env.PUSHOVER_USER;
-var PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN;
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN
+const PUSHOVER_USER = process.env.PUSHOVER_USER
+const PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN
 
-var client = new Discord.Client();
-var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'));
-var citizens = JSON.parse(fs.readFileSync('citizens.json', 'utf8'));
-var debugMode = true;
-var isPlaying = false;
-var reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize'];
-var blockedFile = null;
-var pushover;
+const client = new Discord.Client()
+const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize']
+
+var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
+var citizens = JSON.parse(fs.readFileSync('citizens.json', 'utf8'))
+var debugMode = true
+var isPlaying = false
+var blockedFile = null
+var pushover
 
 // PUSH NOTIFICATIONS
 if (PUSHOVER_USER && PUSHOVER_TOKEN) {
-  pushover = new push( {
-      user: PUSHOVER_USER,
-      token: PUSHOVER_TOKEN,
-      onerror: function(error) {
-        console.log(error);
-      }
-  });
+  pushover = new push({ // eslint-disable-line
+    user: PUSHOVER_USER,
+    token: PUSHOVER_TOKEN,
+    onerror: function (error) {
+      console.log(error)
+    }
+  })
 }
 
 // MAIN LOOP
 client.on('ready', () => {
-  console.log('Memebot ready');
-});
+  console.log('Memebot ready')
+})
 
 client.on('message', message => {
   try {
-    if (message == null || message.content.substring(0,1) !== '!' || message.content.length <= 1) {
-      return;
+    if (message == null || message.content.substring(0, 1) !== '!' || message.content.length <= 1) {
+      return
     }
-    message.content = trimWhitespace(message.content);
-    var words = message.content.substring(1).split(' ');
-    command = words[0].toLowerCase();
+    message.content = trimWhitespace(message.content)
+    let words = message.content.substring(1).split(' ')
+    let command = words[0].toLowerCase()
     if (command === 'add') {
-      add(message, words);
+      add(message, words)
     } else if (command === 'delete') {
-      remove(message, words);
+      remove(message, words)
     } else if (command === 'list') {
-      list(message, words);
+      list(message, words)
     } else if (command === 'help') {
-      help(message);
+      help(message)
     } else if (command === 'random') {
-      random(message, words);
+      random(message, words)
     } else if (command === 'info') {
-      info(message, words);
+      info(message, words)
     } else if (command === 'naturalize') {
-      naturalize(message, words);
+      naturalize(message, words)
     } else if (command === 'vote') {
-      vote(message, words);
+      vote(message, words)
     } else if (command === 'airhorn') {
-      return;
+      return
     } else {
-      play(message, words);
+      play(message, words)
     }
-  } catch(err) {
-    console.log(err);
+  } catch (err) {
+    console.log(err)
     if (pushover) {
-      var msg = {
-        message: 'Memebot has fallen and can\'t get up',   // required
-        title: "Memebot",
+      let msg = {
+        message: 'Memebot has fallen and can\'t get up',
+        title: 'Memebot',
         sound: 'gamelan',
         device: 'iphone',
         priority: 1
-      };
-      pushover.send(msg, function(err, result) {
-        if (err) throw err;
-        console.log(result);
-        process.exit(0);
-      });
+      }
+      pushover.send(msg, function (err, result) {
+        if (err) throw err
+        console.log(result)
+        process.exit(0)
+      })
     }
   }
-});
+})
 
 // ADD
-function add(message, words) {
+function add (message, words) {
   if (words.length < 5) {
-    displayErrorText(message);
-    return;
+    displayErrorText(message)
+    return
   }
 
-  var stream = ytdl(words[1]);
-  var startTime = words[2];
-  var endTime = words[3];
+  let stream = ytdl(words[1])
+  let startTime = words[2]
+  let endTime = words[3]
 
-  var commands = [];
-  for (var i = 4; i < words.length; i++) {
-    commands.push(words[i].replace(',', ''));
+  let commands = []
+  for (let i = 4; i < words.length; i++) {
+    commands.push(words[i].replace(',', ''))
   }
 
-  for (var i = 0; i < commands.length; i++) {
-    for (var j = 0; j < reservedWords.length; j++) {
+  for (let i = 0; i < commands.length; i++) {
+    for (let j = 0; j < reservedWords.length; j++) {
       if (commands[i].toLowerCase() === reservedWords[j].toLowerCase()) {
-        message.channel.sendMessage('The command **' + commadns[i] + '** is a reserved word. Please use a different name.');
+        message.channel.sendMessage('The command **' + commands[i] + '** is a reserved word. Please use a different name.')
         debug(message.author.username + ' tried to add the ' + commands[i] + ' command which is a reserved word')
       }
     }
   }
 
-  for (var i = 0; i < memes.length; i++) {
-    for (var j = 0; j < memes[i]['commands'].length; j++) {
-      for (var k = 0; k < commands.length; k++) {
+  for (let i = 0; i < memes.length; i++) {
+    for (let j = 0; j < memes[i]['commands'].length; j++) {
+      for (let k = 0; k < commands.length; k++) {
         if (memes[i]['commands'][j].toLowerCase() === commands[k].toLowerCase()) {
-          message.channel.sendMessage('The command **' + commands[k] + '** already exists! Please delete it first.');
+          message.channel.sendMessage('The command **' + commands[k] + '** already exists! Please delete it first.')
           debug(message.author.username + ' tried to add the ' + commands[k] + ' command which already exists')
-          return;
+          return
         }
       }
     }
   }
 
-  var endSeekOption = '-to ' + endTime;
-  var filePath = makeFilePath('audio/', commands[0], '.mp3');
+  let endSeekOption = '-to ' + endTime
+  let filePath = makeFilePath('audio/', commands[0], '.mp3')
 
-  blockedFile = commands[0] + '.mp3';
+  blockedFile = commands[0] + '.mp3'
   ffmpeg(stream)
   .noVideo()
   .seekOutput(startTime)
   .format('mp3')
   .outputOptions(['-write_xing 0', endSeekOption])
   .save(filePath)
-  .on('error', function(err, stdout, stderr) {
-    console.log('Cannot process video: ' + err.message);
-    debug(message.author.username + ' induced an ffmpeg error');
+  .on('end', function (err, stdout, stderr) {
+    if (err) {
+      console.log('Cannot process video: ' + err.message)
+    }
+    blockedFile = null
   })
-  .on('end', function(err, stdout, stderr) {
-    blockedFile = null;
-  });
+  .on('error', function (err, stdout, stderr) {
+    console.log('Cannot process video: ' + err.message)
+    debug(message.author.username + ' induced an ffmpeg error')
+  })
 
-  var d = new Date()
-  var meme = {
+  let d = new Date()
+  let meme = {
     name: commands[0],
     author: message.author.username,
     author_id: message.author.id,
@@ -147,425 +151,427 @@ function add(message, words) {
     lastPlayed: d.toJSON(),
     audioModifier: 1,
     playCount: 0
-  };
-  memes.push(meme);
-  saveMemes();
-  message.channel.sendMessage('Added ' + commands[0]);
-  debug(message.author.username + ' added ' + filePath.substring(6));
+  }
+  memes.push(meme)
+  saveMemes()
+  message.channel.sendMessage('Added ' + commands[0])
+  debug(message.author.username + ' added ' + filePath.substring(6))
 }
 
 // REMOVE
-function remove(message, words) {
-  var index = findIndexByCommand(words[1]);
+function remove (message, words) {
+  let index = findIndexByCommand(words[1])
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[1]);
-    displayErrorText(message);
-    return;
+    message.channel.sendMessage('Could not find meme by name: ' + words[1])
+    displayErrorText(message)
+    return
   }
-  if (memes[index]['author_id'] == message.author.id ||
-  message.author.id == 135936099011788800) {
+  if (memes[index]['author_id'] === message.author.id ||
+  message.author.id === 135936099011788800) {
     deleteMemeByIndex(index)
-    message.channel.sendMessage('Deleted ' + words[1]);
+    message.channel.sendMessage('Deleted ' + words[1])
   } else {
-    message.channel.sendMessage('Only the author may delete memes. Vote for a deletion with the !vote command.');
+    message.channel.sendMessage('Only the author may delete memes. Vote for a deletion with the !vote command.')
   }
 }
 
 // LIST
-function list(message, words) {
-  var names = '```';
-  var list = [];
-  var count = names.length;
-  var isAll = false;
-  var isArchived = false;
-  var isVoting = false;
+function list (message, words) {
+  let names = '```'
+  let list = []
+  let isAll = false
+  let isArchived = false
+  let isVoting = false
 
   if (words.length > 1) {
-    if (words[1] == 'least') {
-      memes.sort(compareMemesLeastRecent);
-    } else if (words[1] == 'most') {
-      memes.sort(compareMemesMostRecent);
-    } else if (words[1] == 'all') {
-      isAll = true;
-    } else if (words[1] == 'archived' || words[1] == 'archives' || words[1] == 'archive') {
-      isArchived = true;
-    } else if (words[1] == 'vote' || words[1] == 'voting' || words[1] == 'votes') {
-      isVoting = true;
+    if (words[1] === 'least') {
+      memes.sort(compareMemesLeastRecent)
+    } else if (words[1] === 'most') {
+      memes.sort(compareMemesMostRecent)
+    } else if (words[1] === 'all') {
+      isAll = true
+    } else if (words[1] === 'archived' || words[1] === 'archives' || words[1] === 'archive') {
+      isArchived = true
+    } else if (words[1] === 'vote' || words[1] === 'voting' || words[1] === 'votes') {
+      isVoting = true
     } else {
-      displayErrorText(message);
-      return;
+      displayErrorText(message)
+      return
     }
   } else {
-    memes.sort(compareMemesMostRecent);
+    memes.sort(compareMemesMostRecent)
   }
 
   if (!isVoting) {
-    for (var i = 0; i < memes.length; i++) {
+    for (let i = 0; i < memes.length; i++) {
       if (isAll || isArchived === memes[i]['archived']) {
-        list.push(memes[i]['name']);
+        list.push(memes[i]['name'])
       }
     }
   } else {
-    for (var i = 0; i < citizens.length; i++) {
-      for (var vote in citizens[i]['votes']) {
-        list.push(vote);
+    for (let i = 0; i < citizens.length; i++) {
+      for (let vote in citizens[i]['votes']) {
+        list.push(vote)
       }
     }
-    list = removeDuplicates(list);
+    list = removeDuplicates(list)
   }
 
-  for (var i = 0; i < list.length; i++) {
-    memeName = list[i];
+  for (let i = 0; i < list.length; i++) {
+    let memeName = list[i]
     if (names.length + memeName.length + 2 <= 1999) {
-      names += memeName;
-      names += ', ';
+      names += memeName
+      names += ', '
     }
   }
 
   if (names.length > 1999) {
-    names = names.substring(0, 1999);
+    names = names.substring(0, 1999)
   }
   if (names.length > 3) {
-    names = names.substring(0, names.length - 2) + '```';
+    names = names.substring(0, names.length - 2) + '```'
   } else {
-    names = '```No memes :\'(```';
+    names = '```No memes :\'(```'
   }
 
-  message.channel.sendMessage(names);
+  message.channel.sendMessage(names)
 }
 
 // HELP
-function help(message) {
-  var helpText =
-  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/archives/votes/all]\nA list of memes. If no modifer is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```';
-  message.channel.sendMessage(helpText);
+function help (message) {
+  const helpText =
+  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/archives/votes/all]\nA list of memes. If no modifer is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```'
+  message.channel.sendMessage(helpText)
 }
 
 // INFO
-function info(message, words) {
-  var memeInput = words[1];
+function info (message, words) {
+  let memeInput = words[1]
   if (memeInput == null) {
-    displayErrorText(message);
-    return;
+    displayErrorText(message)
+    return
   }
-  var index = findIndexByCommand(memeInput);
+  let index = findIndexByCommand(memeInput)
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[1]);
-    return;
+    message.channel.sendMessage('Could not find meme by name: ' + words[1])
+    return
   }
-  var meme = memes[index];
-  var output = '```name: ' + meme['name'] + '\ncommands: ';
-  for (var i = 0; i < meme['commands'].length; i++) {
-    output += meme['commands'][i] + ', ';
+  let meme = memes[index]
+  let output = '```name: ' + meme['name'] + '\ncommands: '
+  for (let i = 0; i < meme['commands'].length; i++) {
+    output += meme['commands'][i] + ', '
   }
-  output = output.substring(0, output.length - 2);
-  var dateLastPlayed = new Date(meme['lastPlayed']);
-  var dateAdded = new Date(meme['dateAdded']);
-  var status = meme['archived'] ? 'archived' : 'active';
-  output += '\nauthor: ' + meme['author'];
-  output += '\nlast played: ' + dateLastPlayed.toString();
-  output += '\ndate added: ' + dateAdded.toDateString();
-  output += '\naudio modifier: ' + meme['audioModifier'];
-  output += '\nplay count: ' + meme['playCount'];
-  output += '\nstatus: ' + status + '```';
-  message.channel.sendMessage(output);
+  output = output.substring(0, output.length - 2)
+  let dateLastPlayed = new Date(meme['lastPlayed'])
+  let dateAdded = new Date(meme['dateAdded'])
+  let status = meme['archived'] ? 'archived' : 'active'
+  output += '\nauthor: ' + meme['author']
+  output += '\nlast played: ' + dateLastPlayed.toString()
+  output += '\ndate added: ' + dateAdded.toDateString()
+  output += '\naudio modifier: ' + meme['audioModifier']
+  output += '\nplay count: ' + meme['playCount']
+  output += '\nstatus: ' + status + '```'
+  message.channel.sendMessage(output)
 }
 
 // RANDOM
-function random(message, words) {
+function random (message, words) {
   if (message.member.voiceChannel == null) {
-    message.channel.sendMessage('You must join a voice channel to play the dank memes');
-    return;
+    message.channel.sendMessage('You must join a voice channel to play the dank memes')
+    return
   }
-  var randomIndex = Math.floor(Math.random() * memes.length);
-  playFile(memes[randomIndex]['file'], message.member.voiceChannel);
+  var randomIndex = Math.floor(Math.random() * memes.length)
+  if (memes[randomIndex]['archived']) {
+    random(message, words)
+  } else {
+    playFile(memes[randomIndex]['file'], message.member.voiceChannel)
+  }
 }
 
 // NATURALIZE
-function naturalize(message, words) {
+function naturalize (message, words) {
   var citizen = findCitizenByID(message.author.id)
   if (citizen == null) {
     citizen = {
-      "name": message.author.username,
-      "id": message.author.id,
-      "votes": {}
+      name: message.author.username,
+      id: message.author.id,
+      votes: {}
     }
-    citizens.push(citizen);
-    saveCitizens();
-    message.channel.sendMessage("Welcome, " + message.author.username + " to the Council of Memes. May dankness guide your way.");
+    citizens.push(citizen)
+    saveCitizens()
+    message.channel.sendMessage('Welcome, ' + message.author.username + ' to the Council of Memes. May dankness guide your way.')
   } else {
-    message.channel.sendMessage("You are already on the meme council you pleb");
+    message.channel.sendMessage('You are already on the meme council you pleb')
   }
 }
 
 // VOTE
-function vote(message, words) {
+function vote (message, words) {
   if (words.length < 2) {
-    displayErrorText(message);
-    return;
+    displayErrorText(message)
+    return
   }
 
-  var index = findIndexByCommand(words[1]);
+  var index = findIndexByCommand(words[1])
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[1]);
-    displayErrorText(message);
-    return;
+    message.channel.sendMessage('Could not find meme by name: ' + words[1])
+    displayErrorText(message)
+    return
   }
 
   var citizen = findCitizenByID(message.author.id)
   if (citizen == null) {
-    message.channel.sendMessage('You must naturalize to become a citizen of memebotopia');
-    displayErrorText(message);
-    return;
+    message.channel.sendMessage('You must naturalize to become a citizen of memebotopia')
+    displayErrorText(message)
+    return
   }
 
-  var memeName = memes[index]['name'];
-  var memeArchived = memes[index]['archived'];
+  var memeName = memes[index]['name']
+  var memeArchived = memes[index]['archived']
   if (words[2] === 'for' || words[2] === 'yea') {
     if (memeArchived) {
-      citizen['votes'][memeName] = 'keep';
+      citizen['votes'][memeName] = 'keep'
     } else {
-      citizen['votes'][memeName] = 'remove';
+      citizen['votes'][memeName] = 'remove'
     }
   } else if (words[2] === 'against' || words[2] === 'nay') {
     if (!memeArchived) {
-      citizen['votes'][memeName] = 'keep';
+      citizen['votes'][memeName] = 'keep'
     } else {
-      citizen['votes'][memeName] = 'remove';
+      citizen['votes'][memeName] = 'remove'
     }
   } else if (words[2] === 'keep') {
-    citizen['votes'][memeName] = 'keep';
+    citizen['votes'][memeName] = 'keep'
   } else if (words[2] === 'remove') {
-    citizen['votes'][memeName] = 'remove';
+    citizen['votes'][memeName] = 'remove'
   } else if (words[2] === 'abstain') {
-    citizen['votes'][memeName] = 'abstain';
+    citizen['votes'][memeName] = 'abstain'
   }
 
-  var resolution = '';
+  var resolution = ''
   if (memeArchived) {
-    resolution += '**Resolution to revive** ***' + memeName + '*** **and restore memebotopia to its former glory.**\n\n';
+    resolution += '**Resolution to revive** ***' + memeName + '*** **and restore memebotopia to its former glory.**\n\n'
   } else {
-    resolution += '**Resolution to remove** ***' + memeName + '*** **and restore memebotopia to its former glory.**\n\n';
+    resolution += '**Resolution to remove** ***' + memeName + '*** **and restore memebotopia to its former glory.**\n\n'
   }
 
-  var yeas = 0;
-  var nays = 0;
-  var abstains = 0;
-  var noVotes = 0;
+  var yeas = 0
+  var nays = 0
+  var abstains = 0
+  var noVotes = 0
   for (var i = 0; i < citizens.length; i++) {
-    var vote = citizens[i]['votes'][memeName];
-    if (vote === 'keep' && memeArchived || vote === 'remove' && !memeArchived) {
-      yeas += 1;
-    } else if (vote === 'keep' && !memeArchived || vote === 'remove' && memeArchived) {
-      nays += 1;
+    var vote = citizens[i]['votes'][memeName]
+    if ((vote === 'keep' && memeArchived) || (vote === 'remove' && !memeArchived)) {
+      yeas += 1
+    } else if ((vote === 'keep' && !memeArchived) || (vote === 'remove' && memeArchived)) {
+      nays += 1
     } else if (vote === 'abstain') {
-      abstains += 1;
+      abstains += 1
     } else {
-      noVotes += 1;
+      noVotes += 1
     }
   }
 
-  resolution += ('yea: ' + yeas + '\n');
-  resolution += ('nay: ' + nays + '\n');
-  resolution += ('abstain: ' + abstains + '\n');
-  resolution += ('no vote: ' + noVotes + '\n');
+  resolution += ('yea: ' + yeas + '\n')
+  resolution += ('nay: ' + nays + '\n')
+  resolution += ('abstain: ' + abstains + '\n')
+  resolution += ('no vote: ' + noVotes + '\n')
 
   if (nays >= citizens.length / 2) {
-    resolution += '\nThe neas have it! The resolution is struck down.';
-    clearVotes(memeName);
+    resolution += '\nThe neas have it! The resolution is struck down.'
+    clearVotes(memeName)
   } else if (yeas > citizens.length / 2) {
-    resolution += '\nThe ayes have it! The resolution is passed.';
-    memes[index]['archived'] = !memeArchived;
-    saveMemes();
+    resolution += '\nThe ayes have it! The resolution is passed.'
+    memes[index]['archived'] = !memeArchived
+    saveMemes()
     var result = memeArchived ? 'unarchived' : 'archived'
     var resultUpper = memeArchived ? 'Unarchived' : 'Archived'
-    resolution += ' The meme, ' + memeName + ', has been ' + result + '.';
-    debug(resultUpper + ' ' + memeName);
-    clearVotes(memeName);
+    resolution += ' The meme, ' + memeName + ', has been ' + result + '.'
+    debug(resultUpper + ' ' + memeName)
+    clearVotes(memeName)
   } else if (yeas + nays >= citizens.length) {
-    resolution += '\nGridlock! The resolution dies.';
-    clearVotes(memeName);
+    resolution += '\nGridlock! The resolution dies.'
+    clearVotes(memeName)
   } else {
-    var votesNeeded = (Math.floor(citizens.length / 2)) + 1 - yeas;
-    resolution += '\n' + votesNeeded + ' more yea(s) needed to pass this resolution.';
+    var votesNeeded = (Math.floor(citizens.length / 2)) + 1 - yeas
+    resolution += '\n' + votesNeeded + ' more yea(s) needed to pass this resolution.'
   }
 
   saveCitizens()
-  message.channel.sendMessage(resolution);
+  message.channel.sendMessage(resolution)
 }
 
 // PLAY
-function play(message, words) {
+function play (message, words) {
   if (message.member.voiceChannel == null) {
-    message.channel.sendMessage('You must join a voice channel to play the dank memes');
-    return;
+    message.channel.sendMessage('You must join a voice channel to play the dank memes')
+    return
   }
-  var memeInput = words[0];
-  if (words[0].length == 0 && words.length > 1) {
-    var memeInput = words[1];
+  var memeInput = words[0]
+  if (words[0].length === 0 && words.length > 1) {
+    memeInput = words[1]
   }
   if (memeInput == null) {
-    displayErrorText(message);
-    return;
+    displayErrorText(message)
+    return
   }
-  var index = findIndexByCommand(memeInput);
+  var index = findIndexByCommand(memeInput)
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[0]);
-    return;
+    message.channel.sendMessage('Could not find meme by name: ' + words[0])
+    return
   }
   if (memes[index]['archived']) {
-    message.channel.sendMessage('Cannot play archived meme: ' + words[0]);
-    return;
+    message.channel.sendMessage('Cannot play archived meme: ' + words[0])
+    return
   }
-  var file = memes[index]['file'];
-  playFile(file, message.member.voiceChannel);
+  var file = memes[index]['file']
+  playFile(file, message.member.voiceChannel)
   var d = new Date()
   memes[index]['lastPlayed'] = d.toJSON()
-  memes[index]['playCount'] += 1;
-  saveMemes();
+  memes[index]['playCount'] += 1
+  saveMemes()
 }
 
-function playFile(file, voiceChannel) {
+function playFile (file, voiceChannel) {
   if (!isPlaying && file !== blockedFile) {
-    isPlaying = true;
+    isPlaying = true
     voiceChannel.join()
       .then(connection => {
         debug('Playing ' + file)
-        const dispatcher = connection.playFile('audio/' + file, {volume: 0.50});
+        const dispatcher = connection.playFile('audio/' + file, {volume: 0.50})
         dispatcher.on('end', () => {
           debug('Stopped playing ' + file)
-          voiceChannel.leave();
-          isPlaying = false;
-        });
+          voiceChannel.leave()
+          isPlaying = false
+        })
       })
-      .catch(console.log);
+      .catch(console.log)
   }
 }
 
 // HELPERS
-function displayErrorText(message) {
+function displayErrorText (message) {
   var errorText =
-  'You did something wrong.\nType **!help** my adult son.';
-  message.channel.sendMessage(errorText);
+  'You did something wrong.\nType **!help** my adult son.'
+  message.channel.sendMessage(errorText)
 }
 
-function trimWhitespace(str) {
-  return str.replace(/\s+/g,' ').trim();
+function trimWhitespace (str) {
+  return str.replace(/\s+/g, ' ').trim()
 }
 
-function findIndexByCommand(inputCommand) {
+function findIndexByCommand (inputCommand) {
   if (!inputCommand) {
-    return -1;
+    return -1
   }
   for (var i = 0; i < memes.length; i++) {
-    var meme = memes[i];
+    var meme = memes[i]
     for (var j = 0; j < meme['commands'].length; j++) {
-      var command = meme['commands'][j];
+      var command = meme['commands'][j]
       if (inputCommand.toLowerCase() === command.toLowerCase()) {
-        return i;
+        return i
       }
     }
   }
-  return -1;
+  return -1
 }
 
-function findCitizenByID(author_id) {
+function findCitizenByID (authorId) {
   for (var i = 0; i < citizens.length; i++) {
-    if (citizens[i]['id'] == author_id) {
-      return citizens[i];
+    if (citizens[i]['id'] === authorId) {
+      return citizens[i]
     }
   }
-  return null;
+  return null
 }
 
-function makeFilePath(path, fileName, extension) {
-  var number = 0;
+function makeFilePath (path, fileName, extension) {
+  var number = 0
   while (fs.existsSync(path + makeFileName(fileName, number) + extension)) {
-    number++;
+    number++
   }
-  return path + makeFileName(fileName, number) + extension;
+  return path + makeFileName(fileName, number) + extension
 }
 
-function makeFileName(fileName, number) {
+function makeFileName (fileName, number) {
   if (number === 0) {
-    return fileName;
+    return fileName
   } else {
-    return fileName + number;
+    return fileName + number
   }
 }
 
-function deleteMemeByIndex(index) {
-  var file = memes[index]['file'];
-  memes.splice(index, 1);
-  saveMemes();
+function deleteMemeByIndex (index) {
+  var file = memes[index]['file']
+  memes.splice(index, 1)
+  saveMemes()
   try {
-    fs.unlinkSync('audio/' + file);
+    fs.unlinkSync('audio/' + file)
   } catch (err) {
-    console.log(err);
+    console.log(err)
   }
-  debug('Deleted ' + file);
+  debug('Deleted ' + file)
 }
 
-function clearVotes(memeName) {
+function clearVotes (memeName) {
   for (var i = 0; i < citizens.length; i++) {
-    delete citizens[i]['votes'][memeName];
+    delete citizens[i]['votes'][memeName]
   }
-  saveCitizens();
+  saveCitizens()
 }
 
-function compareMemes(a, b) {
-  return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase());
+function compareMemes (a, b) {
+  return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
 }
 
-function compareMemesMostRecent(a, b) {
-  return b['playCount'] - a['playCount'];
+function compareMemesMostRecent (a, b) {
+  return b['playCount'] - a['playCount']
 }
 
-function compareMemesLeastRecent(a, b) {
-  return a['playCount'] - b['playCount'];
+function compareMemesLeastRecent (a, b) {
+  return a['playCount'] - b['playCount']
 }
 
-function compareCitizens(a, b) {
-  return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase());
+function compareCitizens (a, b) {
+  return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
 }
 
-function removeDuplicates(a) {
-  return a.sort().filter(function(item, pos, ary) {
-    return !pos || item != ary[pos - 1];
+function removeDuplicates (a) {
+  return a.sort().filter(function (item, pos, ary) {
+    return !pos || item !== ary[pos - 1]
   })
 }
 
-function saveMemes() {
-  memes.sort(compareMemes);
-  fs.writeFileSync('memes.json', JSON.stringify(memes, null, 2));
+function saveMemes () {
+  memes.sort(compareMemes)
+  fs.writeFileSync('memes.json', JSON.stringify(memes, null, 2))
 }
 
-function saveCitizens() {
-  citizens.sort(compareCitizens);
-  fs.writeFileSync('citizens.json', JSON.stringify(citizens, null, 2));
+function saveCitizens () {
+  citizens.sort(compareCitizens)
+  fs.writeFileSync('citizens.json', JSON.stringify(citizens, null, 2))
 }
 
 // DEBUG
-function debug(msg) {
+function debug (msg) {
   if (debugMode) {
-    console.log(msg);
+    console.log(msg)
   }
-  var d = new Date();
-  var timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds());
-  msg = '[' + timeString + '] ' + msg + '\n';
-  fs.appendFile('debug.log', msg, function(err) {
-    if(err) {
-      return console.log(err);
+  var d = new Date()
+  var timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
+  msg = '[' + timeString + '] ' + msg + '\n'
+  fs.appendFile('debug.log', msg, function (err) {
+    if (err) {
+      return console.log(err)
     }
-  });
+  })
 }
 
-function formatTime(time) {
+function formatTime (time) {
   if (time <= 9) {
-    return time = '0' + time;
+    time = '0' + time
   }
-  return time;
+  return time
 }
 
-
-client.login(DISCORD_TOKEN);
+client.login(DISCORD_TOKEN)
