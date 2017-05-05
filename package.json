@@ -25,13 +25,17 @@
   },
   "homepage": "https://github.com/arjunchib/memebot#readme",
   "dependencies": {
-    "discord.js": "^9.3.0",
+    "discord.js": "^11.1.0",
+    "erlpack": "github:hammerandchisel/erlpack",
     "fluent-ffmpeg": "^2.1.0",
+    "libsodium-wrappers": "^0.5.1",
+    "node-opus": "^0.2.6",
     "pushover-notifications": "^0.2.3",
+    "uws": "^0.14.5",
     "ytdl-core": "^0.7.24"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=7"
   },
   "devDependencies": {
     "standard": "^10.0.2"

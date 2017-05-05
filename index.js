@@ -9,7 +9,7 @@ const PUSHOVER_USER = process.env.PUSHOVER_USER
 const PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN
 
 const client = new Discord.Client()
-const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize']
+const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize', 'volume']
 
 var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
 var citizens = JSON.parse(fs.readFileSync('citizens.json', 'utf8'))
@@ -56,6 +56,8 @@ client.on('message', message => {
       info(message, words)
     } else if (command === 'naturalize') {
       naturalize(message, words)
+    } else if (command === 'volume') {
+      volume(message, words)
     } else if (command === 'vote') {
       vote(message, words)
     } else if (command === 'airhorn') {
@@ -101,7 +103,7 @@ function add (message, words) {
   for (let i = 0; i < commands.length; i++) {
     for (let j = 0; j < reservedWords.length; j++) {
       if (commands[i].toLowerCase() === reservedWords[j].toLowerCase()) {
-        message.channel.sendMessage('The command **' + commands[i] + '** is a reserved word. Please use a different name.')
+        message.channel.send('The command **' + commands[i] + '** is a reserved word. Please use a different name.')
         debug(message.author.username + ' tried to add the ' + commands[i] + ' command which is a reserved word')
       }
     }
@@ -111,7 +113,7 @@ function add (message, words) {
     for (let j = 0; j < memes[i]['commands'].length; j++) {
       for (let k = 0; k < commands.length; k++) {
         if (memes[i]['commands'][j].toLowerCase() === commands[k].toLowerCase()) {
-          message.channel.sendMessage('The command **' + commands[k] + '** already exists! Please delete it first.')
+          message.channel.send('The command **' + commands[k] + '** already exists! Please delete it first.')
           debug(message.author.username + ' tried to add the ' + commands[k] + ' command which already exists')
           return
         }
@@ -144,7 +146,7 @@ function add (message, words) {
   let meme = {
     name: commands[0],
     author: message.author.username,
-    author_id: message.author.id,
+    authorID: message.author.id,
     commands: commands,
     file: filePath.substring(6),
     dateAdded: d.toJSON(),
@@ -154,7 +156,7 @@ function add (message, words) {
   }
   memes.push(meme)
   saveMemes()
-  message.channel.sendMessage('Added ' + commands[0])
+  message.channel.send('Added ' + commands[0])
   debug(message.author.username + ' added ' + filePath.substring(6))
 }
 
@@ -162,16 +164,15 @@ function add (message, words) {
 function remove (message, words) {
   let index = findIndexByCommand(words[1])
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[1])
+    message.channel.send('Could not find meme by name: ' + words[1])
     displayErrorText(message)
     return
   }
-  if (memes[index]['author_id'] === message.author.id ||
-  message.author.id === 135936099011788800) {
+  if (hasAccess(memes[index], message.author)) {
     deleteMemeByIndex(index)
-    message.channel.sendMessage('Deleted ' + words[1])
+    message.channel.send('Deleted ' + words[1])
   } else {
-    message.channel.sendMessage('Only the author may delete memes. Vote for a deletion with the !vote command.')
+    message.channel.send('Only the author may delete memes. Vote for a deletion with the !vote command.')
   }
 }
 
@@ -234,14 +235,14 @@ function list (message, words) {
     names = '```No memes :\'(```'
   }
 
-  message.channel.sendMessage(names)
+  message.channel.send(names)
 }
 
 // HELP
 function help (message) {
   const helpText =
-  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/archives/votes/all]\nA list of memes. If no modifer is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```'
-  message.channel.sendMessage(helpText)
+  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/archives/votes/all]\nA list of memes. If no modifier is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!volume [meme] [audio modifier]\nSets an audio modifier for the meme, such that 0.5 is half the normal volume and 2.0 is twice the normal volume. Only the person who added the meme may change its volume.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```'
+  message.channel.send(helpText)
 }
 
 // INFO
@@ -253,7 +254,7 @@ function info (message, words) {
   }
   let index = findIndexByCommand(memeInput)
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[1])
+    message.channel.send('Could not find meme by name: ' + words[1])
     return
   }
   let meme = memes[index]
@@ -271,20 +272,51 @@ function info (message, words) {
   output += '\naudio modifier: ' + meme['audioModifier']
   output += '\nplay count: ' + meme['playCount']
   output += '\nstatus: ' + status + '```'
-  message.channel.sendMessage(output)
+  message.channel.send(output)
 }
 
 // RANDOM
 function random (message, words) {
   if (message.member.voiceChannel == null) {
-    message.channel.sendMessage('You must join a voice channel to play the dank memes')
+    message.channel.send('You must join a voice channel to play the dank memes')
     return
   }
   let randomIndex = Math.floor(Math.random() * memes.length)
   if (memes[randomIndex]['archived']) {
     random(message, words)
   } else {
-    playFile(memes[randomIndex]['file'], message.member.voiceChannel)
+    playMeme(memes[randomIndex], message.member.voiceChannel)
+  }
+}
+
+// VOLUME
+function volume (message, words) {
+  if (words.length < 3) {
+    displayErrorText(message)
+    return
+  }
+  let memeInput = words[1]
+  if (memeInput == null) {
+    displayErrorText(message)
+    return
+  }
+  let audioModifier = words[2]
+  if (audioModifier == null || isNaN(audioModifier) || audioModifier < 0) {
+    displayErrorText(message)
+    return
+  }
+  let index = findIndexByCommand(memeInput)
+  if (index === -1) {
+    message.channel.send('Could not find meme by name: ' + words[1])
+    return
+  }
+  if (hasAccess(memes[index], message.author)) {
+    memes[index]['audioModifier'] = audioModifier
+    saveMemes()
+    message.channel.send('The audio modifier of ' + memeInput + ' has been set to: ' + audioModifier)
+    debug('Audio modifier of ' + memes[index]['name'] + ' set to ' + audioModifier)
+  } else {
+    message.channel.send('Only the author may modify memes. Contact ' + memes[index]['author'] + ' to change volume.')
   }
 }
 
@@ -299,29 +331,29 @@ function naturalize (message, words) {
     }
     citizens.push(citizen)
     saveCitizens()
-    message.channel.sendMessage('Welcome, ' + message.author.username + ' to the Council of Memes. May dankness guide your way.')
+    message.channel.send('Welcome, ' + message.author.username + ' to the Council of Memes. May dankness guide your way.')
   } else {
-    message.channel.sendMessage('You are already on the meme council you pleb')
+    message.channel.send('You are already on the meme council you pleb')
   }
 }
 
 // VOTE
 function vote (message, words) {
-  if (words.length < 2) {
+  if (words.length < 3) {
     displayErrorText(message)
     return
   }
 
   let index = findIndexByCommand(words[1])
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[1])
+    message.channel.send('Could not find meme by name: ' + words[1])
     displayErrorText(message)
     return
   }
 
   let citizen = findCitizenByID(message.author.id)
   if (citizen == null) {
-    message.channel.sendMessage('You must naturalize to become a citizen of memebotopia')
+    message.channel.send('You must naturalize to become a citizen of memebotopia')
     displayErrorText(message)
     return
   }
@@ -398,13 +430,13 @@ function vote (message, words) {
   }
 
   saveCitizens()
-  message.channel.sendMessage(resolution)
+  message.channel.send(resolution)
 }
 
 // PLAY
 function play (message, words) {
   if (message.member.voiceChannel == null) {
-    message.channel.sendMessage('You must join a voice channel to play the dank memes')
+    message.channel.send('You must join a voice channel to play the dank memes')
     return
   }
   let memeInput = words[0]
@@ -417,35 +449,43 @@ function play (message, words) {
   }
   let index = findIndexByCommand(memeInput)
   if (index === -1) {
-    message.channel.sendMessage('Could not find meme by name: ' + words[0])
+    message.channel.send('Could not find meme by name: ' + words[0])
     return
   }
   if (memes[index]['archived']) {
-    message.channel.sendMessage('Cannot play archived meme: ' + words[0])
+    message.channel.send('Cannot play archived meme: ' + words[0])
     return
   }
-  let file = memes[index]['file']
-  playFile(file, message.member.voiceChannel)
+  let meme = memes[index]
+  playMeme(meme, message.member.voiceChannel)
   let d = new Date()
   memes[index]['lastPlayed'] = d.toJSON()
   memes[index]['playCount'] += 1
   saveMemes()
 }
 
-function playFile (file, voiceChannel) {
+function playMeme (meme, voiceChannel) {
+  let file = meme['file']
+  let audioMod = meme['audioModifier']
   if (!isPlaying && file !== blockedFile) {
     isPlaying = true
-    voiceChannel.join()
-      .then(connection => {
-        debug('Playing ' + file)
-        const dispatcher = connection.playFile('audio/' + file, {volume: 0.50})
-        dispatcher.on('end', () => {
-          debug('Stopped playing ' + file)
-          voiceChannel.leave()
-          isPlaying = false
+    try {
+      voiceChannel.join()
+        .then(connection => {
+          debug('Playing ' + file)
+          const dispatcher = connection.playFile('audio/' + file, {
+            volume: 0.50 * audioMod
+          })
+          dispatcher.on('end', () => {
+            debug('Stopped playing ' + file)
+            voiceChannel.leave()
+            isPlaying = false
+          })
         })
-      })
-      .catch(console.log)
+        .catch(console.log)
+    } catch (err) {
+      console.log(err)
+    }
   }
 }
 
@@ -453,7 +493,7 @@ function playFile (file, voiceChannel) {
 function displayErrorText (message) {
   let errorText =
   'You did something wrong.\nType **!help** my adult son.'
-  message.channel.sendMessage(errorText)
+  message.channel.send(errorText)
 }
 
 function trimWhitespace (str) {
@@ -476,9 +516,9 @@ function findIndexByCommand (inputCommand) {
   return -1
 }
 
-function findCitizenByID (authorId) {
+function findCitizenByID (authorID) {
   for (let i = 0; i < citizens.length; i++) {
-    if (citizens[i]['id'] === authorId) {
+    if (citizens[i]['id'] === authorID) {
       return citizens[i]
     }
   }
@@ -540,6 +580,10 @@ function removeDuplicates (a) {
   return a.sort().filter(function (item, pos, ary) {
     return !pos || item !== ary[pos - 1]
   })
+}
+
+function hasAccess (meme, author) {
+  return (author.id === '135936099011788800' || (meme['authorID'] != null && meme['authorID'] === author.id))
 }
 
 function saveMemes () {
