@@ -152,7 +152,8 @@ function add (message, words) {
     dateAdded: d.toJSON(),
     lastPlayed: d.toJSON(),
     audioModifier: 1,
-    playCount: 0
+    playCount: 0,
+    archived: false
   }
   memes.push(meme)
   saveMemes()
@@ -186,9 +187,9 @@ function list (message, words) {
 
   if (words.length > 1) {
     if (words[1] === 'least') {
-      memes.sort(compareMemesLeastRecent)
+      memes.sort(compareMemesLeastPlayed)
     } else if (words[1] === 'most') {
-      memes.sort(compareMemesMostRecent)
+      memes.sort(compareMemesMostPlayed)
     } else if (words[1] === 'newest') {
       memes.sort(compareMemesNewest)
     } else if (words[1] === 'oldest') {
@@ -204,7 +205,7 @@ function list (message, words) {
       return
     }
   } else {
-    memes.sort(compareMemesMostRecent)
+    memes.sort(compareMemesMostPlayed)
   }
 
   if (!isVoting) {
@@ -289,7 +290,7 @@ function random (message, words) {
   if (memes[randomIndex]['archived']) {
     random(message, words)
   } else {
-    playMeme(memes[randomIndex], message.member.voiceChannel)
+    playMeme(memes[randomIndex], message.member.voiceChannel, true)
     message.channel.send('Playing ' + memes[randomIndex]['name'])
   }
 }
@@ -462,21 +463,25 @@ function play (message, words) {
     return
   }
   let meme = memes[index]
-  playMeme(meme, message.member.voiceChannel)
+  playMeme(meme, message.member.voiceChannel, false)
   let d = new Date()
   memes[index]['lastPlayed'] = d.toJSON()
   memes[index]['playCount'] += 1
   saveMemes()
 }
 
-function playMeme (meme, voiceChannel) {
+function playMeme (meme, voiceChannel, isRandom) {
   let file = meme['file']
   let audioMod = meme['audioModifier']
   if (!isPlaying && file !== blockedFile) {
     isPlaying = true
     voiceChannel.join()
       .then(connection => {
-        debug('Playing ' + file)
+        if (isRandom) {
+          debug('Randomly playing ' + file)
+        } else {
+          debug('Playing ' + file)
+        }
         const dispatcher = connection.playFile('audio/' + file, {
           volume: 0.50 * audioMod
         })
@@ -488,7 +493,6 @@ function playMeme (meme, voiceChannel) {
       })
       .catch(function (e) {
         console.log(e)
-        console.log('hi')
       })
   }
 }
@@ -568,11 +572,11 @@ function compareMemes (a, b) {
   return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
 }
 
-function compareMemesMostRecent (a, b) {
+function compareMemesMostPlayed (a, b) {
   return b['playCount'] - a['playCount']
 }
 
-function compareMemesLeastRecent (a, b) {
+function compareMemesLeastPlayed (a, b) {
   return a['playCount'] - b['playCount']
 }
 
@@ -581,7 +585,7 @@ function compareMemesNewest (a, b) {
 }
 
 function compareMemesOldest (a, b) {
-  return b['dateAdded'] - a['dateAdded']
+  return new Date(a['dateAdded']) - new Date(b['dateAdded'])
 }
 
 function compareCitizens (a, b) {

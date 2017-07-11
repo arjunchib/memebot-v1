@@ -4,8 +4,9 @@ var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
 
 // var d = new Date(0)
 for (let i = 0; i < memes.length; i++) {
-  memes[i]['authorID'] = memes[i]['author_id']
-  delete memes[i]['author_id']
+  if (memes[i]['archived'] == null) {
+    memes[i]['archived'] = false
+  }
 }
 saveMemes()
 
