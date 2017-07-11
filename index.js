@@ -189,6 +189,10 @@ function list (message, words) {
       memes.sort(compareMemesLeastRecent)
     } else if (words[1] === 'most') {
       memes.sort(compareMemesMostRecent)
+    } else if (words[1] === 'newest') {
+      memes.sort(compareMemesNewest)
+    } else if (words[1] === 'oldest') {
+      memes.sort(compareMemesOldest)
     } else if (words[1] === 'all') {
       isAll = true
     } else if (words[1] === 'archived' || words[1] === 'archives' || words[1] === 'archive') {
@@ -241,7 +245,7 @@ function list (message, words) {
 // HELP
 function help (message) {
   const helpText =
-  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/archives/votes/all]\nA list of memes. If no modifier is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!volume [meme] [audio modifier]\nSets an audio modifier for the meme, such that 0.5 is half the normal volume and 2.0 is twice the normal volume. Only the person who added the meme may change its volume.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```'
+  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/newest/oldest/archives/votes/all]\nA list of memes. If no modifier is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!volume [meme] [audio modifier]\nSets an audio modifier for the meme, such that 0.5 is half the normal volume and 2.0 is twice the normal volume. Only the person who added the meme may change its volume.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```'
   message.channel.send(helpText)
 }
 
@@ -286,6 +290,7 @@ function random (message, words) {
     random(message, words)
   } else {
     playMeme(memes[randomIndex], message.member.voiceChannel)
+    message.channel.send('Playing ' + memes[randomIndex]['name'])
   }
 }
 
@@ -469,23 +474,22 @@ function playMeme (meme, voiceChannel) {
   let audioMod = meme['audioModifier']
   if (!isPlaying && file !== blockedFile) {
     isPlaying = true
-    try {
-      voiceChannel.join()
-        .then(connection => {
-          debug('Playing ' + file)
-          const dispatcher = connection.playFile('audio/' + file, {
-            volume: 0.50 * audioMod
-          })
-          dispatcher.on('end', () => {
-            debug('Stopped playing ' + file)
-            voiceChannel.leave()
-            isPlaying = false
-          })
+    voiceChannel.join()
+      .then(connection => {
+        debug('Playing ' + file)
+        const dispatcher = connection.playFile('audio/' + file, {
+          volume: 0.50 * audioMod
         })
-        .catch(console.log)
-    } catch (err) {
-      console.log(err)
-    }
+        dispatcher.on('end', () => {
+          debug('Stopped playing ' + file)
+          voiceChannel.leave()
+          isPlaying = false
+        })
+      })
+      .catch(function (e) {
+        console.log(e)
+        console.log('hi')
+      })
   }
 }
 
@@ -570,6 +574,14 @@ function compareMemesMostRecent (a, b) {
 
 function compareMemesLeastRecent (a, b) {
   return a['playCount'] - b['playCount']
+}
+
+function compareMemesNewest (a, b) {
+  return new Date(b['dateAdded']) - new Date(a['dateAdded'])
+}
+
+function compareMemesOldest (a, b) {
+  return b['dateAdded'] - a['dateAdded']
 }
 
 function compareCitizens (a, b) {

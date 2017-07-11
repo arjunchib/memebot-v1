@@ -21,9 +21,9 @@
     "file": "2001.mp3",
     "name": "2001",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 3,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-28T05:56:30.075Z",
+    "lastPlayed": "2017-07-08T02:03:26.433Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -52,8 +52,8 @@
     "file": "2manycooks.mp3",
     "dateAdded": "2016-12-13T22:10:46.283Z",
     "audioModifier": 1,
-    "playCount": 4,
-    "lastPlayed": "2017-05-02T02:29:58.740Z",
+    "playCount": 6,
+    "lastPlayed": "2017-05-13T02:58:57.274Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -65,9 +65,9 @@
     "file": "2much.mp3",
     "name": "2much",
     "audioModifier": 1,
-    "playCount": 22,
+    "playCount": 23,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-28T05:26:10.996Z",
+    "lastPlayed": "2017-05-27T01:58:15.762Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -138,9 +138,9 @@
     ],
     "file": "alex.mp3",
     "dateAdded": "2017-03-14T05:06:16.159Z",
-    "lastPlayed": "2017-04-27T02:56:59.373Z",
+    "lastPlayed": "2017-05-20T04:11:17.456Z",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 9,
     "archived": false,
     "authorID": ""
   },
@@ -151,13 +151,39 @@
     ],
     "file": "alive.mp3",
     "name": "alive",
-    "audioModifier": 1,
-    "playCount": 4,
+    "audioModifier": "1.5",
+    "playCount": 7,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-30T00:24:07.470Z",
+    "lastPlayed": "2017-05-06T06:06:41.337Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "andDie",
+    "author": "flyingkitty",
+    "authorID": "138813284773003264",
+    "commands": [
+      "andDie"
+    ],
+    "file": "andDie.mp3",
+    "dateAdded": "2017-07-10T03:51:08.417Z",
+    "lastPlayed": "2017-07-11T03:54:26.044Z",
+    "audioModifier": "3",
+    "playCount": 7
+  },
+  {
+    "name": "angel",
+    "author": "arjohn cena",
+    "authorID": "135936099011788800",
+    "commands": [
+      "angel"
+    ],
+    "file": "angel.mp3",
+    "dateAdded": "2017-05-29T04:50:21.657Z",
+    "lastPlayed": "2017-06-01T01:36:05.759Z",
+    "audioModifier": 1,
+    "playCount": 3
   },
   {
     "name": "anime",
@@ -167,8 +193,8 @@
     "file": "anime.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 17,
-    "lastPlayed": "2017-04-19T23:54:19.510Z",
+    "playCount": 18,
+    "lastPlayed": "2017-05-29T05:02:45.448Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -212,9 +238,9 @@
     ],
     "file": "baconpancakes.mp3",
     "dateAdded": "2017-04-28T05:47:48.783Z",
-    "lastPlayed": "2017-04-28T05:48:13.129Z",
+    "lastPlayed": "2017-05-30T17:53:28.091Z",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 3,
     "authorID": "135936099011788800"
   },
   {
@@ -238,8 +264,8 @@
     "file": "barnacle.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 8,
-    "lastPlayed": "2017-05-04T19:19:07.651Z",
+    "playCount": 9,
+    "lastPlayed": "2017-05-06T06:18:04.702Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -252,11 +278,24 @@
     ],
     "file": "battlecry.mp3",
     "dateAdded": "2017-04-14T02:32:00.474Z",
-    "lastPlayed": "2017-04-23T02:42:18.232Z",
+    "lastPlayed": "2017-06-19T01:04:37.321Z",
     "audioModifier": 1,
-    "playCount": 11,
+    "playCount": 13,
     "archived": false,
     "authorID": "125288896383811584"
+  },
+  {
+    "name": "beach",
+    "author": "Crashbandicunt",
+    "authorID": "212391311142158337",
+    "commands": [
+      "beach"
+    ],
+    "file": "beach.mp3",
+    "dateAdded": "2017-06-01T22:54:54.477Z",
+    "lastPlayed": "2017-07-11T00:05:27.192Z",
+    "audioModifier": 1,
+    "playCount": 6
   },
   {
     "name": "beatdown",
@@ -265,9 +304,9 @@
     ],
     "file": "beatdown.mp3",
     "dateAdded": "2016-12-13T21:28:23.553Z",
-    "audioModifier": 1,
-    "playCount": 9,
-    "lastPlayed": "2017-05-04T19:38:44.118Z",
+    "audioModifier": "0.5",
+    "playCount": 11,
+    "lastPlayed": "2017-05-20T04:56:32.013Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -294,9 +333,9 @@
     ],
     "file": "behumble.mp3",
     "dateAdded": "2017-04-08T23:58:40.124Z",
-    "lastPlayed": "2017-04-26T02:35:12.925Z",
+    "lastPlayed": "2017-05-20T05:25:29.160Z",
     "audioModifier": 1,
-    "playCount": 8,
+    "playCount": 10,
     "archived": false,
     "authorID": "135936099011788800"
   },
@@ -363,9 +402,9 @@
     "file": "bjork.mp3",
     "name": "bjork",
     "audioModifier": 1,
-    "playCount": 8,
+    "playCount": 10,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-02T23:30:20.964Z",
+    "lastPlayed": "2017-05-19T03:13:39.802Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -378,9 +417,9 @@
     "file": "blbl.mp3",
     "name": "blbl",
     "audioModifier": 1,
-    "playCount": 18,
+    "playCount": 19,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-04T01:37:24.448Z",
+    "lastPlayed": "2017-05-08T06:17:01.720Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -393,10 +432,10 @@
     ],
     "file": "blocked.mp3",
     "name": "blocked",
-    "audioModifier": 1,
-    "playCount": 2,
+    "audioModifier": "2",
+    "playCount": 8,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-06-08T01:05:07.792Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -408,9 +447,9 @@
     "file": "bonesaw.mp3",
     "name": "bonesaw",
     "audioModifier": 1,
-    "playCount": 11,
+    "playCount": 16,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-05T04:29:30.874Z",
+    "lastPlayed": "2017-05-27T01:57:17.601Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -437,8 +476,8 @@
     "file": "booty.mp3",
     "dateAdded": "2016-12-11T04:45:21.533Z",
     "audioModifier": 1,
-    "playCount": 24,
-    "lastPlayed": "2017-05-01T19:24:48.360Z",
+    "playCount": 31,
+    "lastPlayed": "2017-07-11T00:52:40.675Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -450,9 +489,9 @@
     "file": "brexfast.mp3",
     "name": "brexfast",
     "audioModifier": 1,
-    "playCount": 12,
+    "playCount": 14,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-30T00:49:58.975Z",
+    "lastPlayed": "2017-05-27T02:22:10.722Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -481,9 +520,9 @@
     "file": "burs.mp3",
     "name": "burs",
     "audioModifier": 1,
-    "playCount": 6,
+    "playCount": 7,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-29T05:08:40.437Z",
+    "lastPlayed": "2017-05-06T06:21:11.585Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -511,8 +550,8 @@
     "file": "cando.mp3",
     "dateAdded": "2017-01-30T01:44:45.500Z",
     "audioModifier": 1,
-    "playCount": 16,
-    "lastPlayed": "2017-05-03T18:39:12.823Z",
+    "playCount": 20,
+    "lastPlayed": "2017-07-08T02:05:07.091Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -539,9 +578,9 @@
     "file": "cena.mp3",
     "name": "cena",
     "audioModifier": 1,
-    "playCount": 8,
+    "playCount": 10,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-30T03:05:17.099Z",
+    "lastPlayed": "2017-05-19T03:27:17.289Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -570,8 +609,8 @@
     "file": "choke.mp3",
     "dateAdded": "2017-03-06T02:17:56.562Z",
     "audioModifier": 1,
-    "playCount": 17,
-    "lastPlayed": "2017-05-01T19:29:44.710Z",
+    "playCount": 20,
+    "lastPlayed": "2017-05-13T07:31:52.549Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -599,8 +638,8 @@
     "file": "consequences.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 9,
-    "lastPlayed": "2017-03-21T00:19:25.415Z",
+    "playCount": 12,
+    "lastPlayed": "2017-06-09T00:03:10.982Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -628,8 +667,8 @@
     "file": "cosbymon.mp3",
     "dateAdded": "2017-03-14T02:23:43.950Z",
     "audioModifier": 1,
-    "playCount": 8,
-    "lastPlayed": "2017-05-05T04:30:12.545Z",
+    "playCount": 9,
+    "lastPlayed": "2017-07-08T01:57:18.745Z",
     "archived": false,
     "authorID": ""
   },
@@ -656,8 +695,8 @@
     "file": "creep.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 30,
-    "lastPlayed": "2017-04-30T00:01:32.391Z",
+    "playCount": 32,
+    "lastPlayed": "2017-05-29T05:11:30.713Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -670,8 +709,8 @@
     "file": "croissant.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 32,
-    "lastPlayed": "2017-04-30T03:04:40.563Z",
+    "playCount": 39,
+    "lastPlayed": "2017-07-11T03:04:15.446Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -685,8 +724,8 @@
     "file": "dabofranch.mp3",
     "dateAdded": "2017-02-02T04:07:21.321Z",
     "audioModifier": 1,
-    "playCount": 15,
-    "lastPlayed": "2017-05-05T04:30:39.465Z",
+    "playCount": 17,
+    "lastPlayed": "2017-07-11T00:37:10.227Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -699,11 +738,24 @@
     "file": "dam.mp3",
     "dateAdded": "2017-02-20T02:47:47.474Z",
     "audioModifier": "1",
-    "playCount": 8,
-    "lastPlayed": "2017-05-05T04:30:49.105Z",
+    "playCount": 9,
+    "lastPlayed": "2017-07-11T03:28:49.182Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "damn",
+    "author": "thebluepumpkin",
+    "authorID": "125288896383811584",
+    "commands": [
+      "damn"
+    ],
+    "file": "damn.mp3",
+    "dateAdded": "2017-07-02T03:28:24.394Z",
+    "lastPlayed": "2017-07-11T03:29:00.048Z",
+    "audioModifier": "5",
+    "playCount": 6
   },
   {
     "commands": [
@@ -713,9 +765,9 @@
     "file": "dank.mp3",
     "name": "dank",
     "audioModifier": 1,
-    "playCount": 10,
+    "playCount": 13,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-05-27T02:22:59.225Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -756,12 +808,25 @@
     "file": "datBoi.mp3",
     "name": "datBoi",
     "audioModifier": 1,
-    "playCount": 7,
+    "playCount": 9,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-27T01:43:16.785Z",
+    "lastPlayed": "2017-05-20T03:40:50.750Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "dedicatedram",
+    "author": "thebluepumpkin",
+    "authorID": "125288896383811584",
+    "commands": [
+      "dedicatedram"
+    ],
+    "file": "dedicatedram.mp3",
+    "dateAdded": "2017-07-10T03:48:48.209Z",
+    "lastPlayed": "2017-07-11T02:39:48.740Z",
+    "audioModifier": 1,
+    "playCount": 2
   },
   {
     "commands": [
@@ -786,9 +851,9 @@
     ],
     "file": "dejavu.mp3",
     "dateAdded": "2017-04-19T23:52:19.195Z",
-    "lastPlayed": "2017-05-05T04:31:48.541Z",
+    "lastPlayed": "2017-07-09T01:04:05.340Z",
     "audioModifier": 1,
-    "playCount": 16,
+    "playCount": 22,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -814,9 +879,9 @@
     ],
     "file": "dio.mp3",
     "dateAdded": "2017-03-21T23:47:28.136Z",
-    "lastPlayed": "2017-05-05T03:52:46.186Z",
+    "lastPlayed": "2017-07-09T01:03:56.300Z",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 11,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -843,8 +908,8 @@
     "file": "dogofwisdom.mp3",
     "dateAdded": "2017-02-19T20:51:34.896Z",
     "audioModifier": 1,
-    "playCount": 10,
-    "lastPlayed": "2017-04-11T00:17:00.493Z",
+    "playCount": 14,
+    "lastPlayed": "2017-06-20T00:45:55.775Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -858,8 +923,8 @@
     "file": "doitlive.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 7,
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "playCount": 12,
+    "lastPlayed": "2017-07-11T00:40:29.054Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -886,8 +951,8 @@
     "file": "dontDoIT.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 12,
-    "lastPlayed": "2017-04-09T02:49:08.542Z",
+    "playCount": 13,
+    "lastPlayed": "2017-07-11T01:06:20.071Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -900,8 +965,8 @@
     "file": "doot.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 52,
-    "lastPlayed": "2017-05-04T01:50:52.594Z",
+    "playCount": 63,
+    "lastPlayed": "2017-07-08T02:05:45.552Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -915,9 +980,9 @@
     "file": "dusty.mp3",
     "name": "dusty",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 6,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-05-13T06:13:28.222Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -925,18 +990,17 @@
   {
     "name": "eatadick",
     "author": "SpicySultanZ",
+    "authorID": "135937763429056513",
     "commands": [
       "eatadick",
-      "kicked",
-      "kickedinyochest",
-      "chest"
+      "kick",
+      "kicked"
     ],
     "file": "eatadick.mp3",
-    "dateAdded": "2017-05-05T04:22:43.180Z",
-    "lastPlayed": "2017-05-05T04:24:39.193Z",
+    "dateAdded": "2017-05-28T19:32:59.193Z",
+    "lastPlayed": "2017-07-09T01:49:45.077Z",
     "audioModifier": 1,
-    "playCount": 2,
-    "authorID": "135937763429056513"
+    "playCount": 4
   },
   {
     "name": "ech",
@@ -946,8 +1010,8 @@
     "file": "ech.mp3",
     "dateAdded": "2017-02-25T03:02:21.518Z",
     "audioModifier": 1,
-    "playCount": 8,
-    "lastPlayed": "2017-05-03T23:37:33.314Z",
+    "playCount": 12,
+    "lastPlayed": "2017-07-09T01:03:49.701Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -960,9 +1024,9 @@
     ],
     "file": "ecuador.mp3",
     "dateAdded": "2017-03-16T03:56:43.539Z",
-    "lastPlayed": "2017-04-30T03:03:32.507Z",
+    "lastPlayed": "2017-07-06T23:36:02.124Z",
     "audioModifier": 1,
-    "playCount": 7,
+    "playCount": 9,
     "archived": false,
     "authorID": "200410336455688192"
   },
@@ -974,9 +1038,9 @@
     "file": "biiiitch.mp3",
     "name": "EmotionalIntelligence",
     "audioModifier": 1,
-    "playCount": 17,
+    "playCount": 22,
     "dateAdded": "2017-02-01T11:25:00.000Z",
-    "lastPlayed": "2017-05-04T19:17:34.356Z",
+    "lastPlayed": "2017-07-09T01:03:41.445Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1003,8 +1067,8 @@
     "file": "enemies.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 17,
-    "lastPlayed": "2017-04-30T00:27:22.052Z",
+    "playCount": 18,
+    "lastPlayed": "2017-05-20T04:11:00.200Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1022,6 +1086,20 @@
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "everyone",
+    "author": "flyingkitty",
+    "authorID": "138813284773003264",
+    "commands": [
+      "everyone",
+      "getinhere"
+    ],
+    "file": "everyone.mp3",
+    "dateAdded": "2017-07-11T01:45:37.322Z",
+    "lastPlayed": "2017-07-11T03:58:30.536Z",
+    "audioModifier": "2",
+    "playCount": 4
   },
   {
     "commands": [
@@ -1045,8 +1123,8 @@
     "file": "faces.mp3",
     "dateAdded": "2017-03-13T01:25:56.414Z",
     "audioModifier": 1,
-    "playCount": 12,
-    "lastPlayed": "2017-05-04T19:13:18.999Z",
+    "playCount": 19,
+    "lastPlayed": "2017-07-09T01:50:07.336Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1060,11 +1138,27 @@
     ],
     "file": "failedMe.mp3",
     "dateAdded": "2017-03-17T01:28:31.764Z",
-    "lastPlayed": "2017-04-30T03:03:16.125Z",
+    "lastPlayed": "2017-07-11T03:56:11.146Z",
     "audioModifier": 1,
-    "playCount": 6,
+    "playCount": 8,
     "archived": false,
     "authorID": "135937763429056513"
+  },
+  {
+    "name": "fast",
+    "author": "SpicySultanZ",
+    "authorID": "135937763429056513",
+    "commands": [
+      "fast",
+      "gofast",
+      "gottago",
+      "gottagofast"
+    ],
+    "file": "fast.mp3",
+    "dateAdded": "2017-07-03T05:27:29.928Z",
+    "lastPlayed": "2017-07-06T23:31:17.653Z",
+    "audioModifier": 1,
+    "playCount": 5
   },
   {
     "name": "fork",
@@ -1088,9 +1182,9 @@
     ],
     "file": "fries.mp3",
     "dateAdded": "2017-03-21T23:32:15.665Z",
-    "lastPlayed": "2017-03-21T23:32:28.112Z",
+    "lastPlayed": "2017-06-17T02:43:21.588Z",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 5,
     "archived": false,
     "authorID": "212391311142158337"
   },
@@ -1104,8 +1198,8 @@
     "file": "future.mp3",
     "dateAdded": "2017-03-13T01:19:29.796Z",
     "audioModifier": 1,
-    "playCount": 5,
-    "lastPlayed": "2017-04-08T23:51:33.920Z",
+    "playCount": 9,
+    "lastPlayed": "2017-07-11T03:29:26.509Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1132,8 +1226,8 @@
     "file": "gameover.mp3",
     "dateAdded": "2016-12-23T05:22:37.904Z",
     "audioModifier": 1,
-    "playCount": 7,
-    "lastPlayed": "2017-04-29T23:36:42.772Z",
+    "playCount": 8,
+    "lastPlayed": "2017-05-20T04:12:14.281Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1167,6 +1261,19 @@
     "authorID": ""
   },
   {
+    "name": "gay",
+    "author": "Crashbandicunt",
+    "authorID": "212391311142158337",
+    "commands": [
+      "gay"
+    ],
+    "file": "gay.mp3",
+    "dateAdded": "2017-05-08T01:24:16.732Z",
+    "lastPlayed": "2017-07-08T01:59:31.170Z",
+    "audioModifier": 1,
+    "playCount": 12
+  },
+  {
     "name": "gay2",
     "author": "Crashbandicunt",
     "commands": [
@@ -1174,9 +1281,9 @@
     ],
     "file": "gay2.mp3",
     "dateAdded": "2017-04-30T03:41:28.554Z",
-    "lastPlayed": "2017-05-05T04:27:41.980Z",
-    "audioModifier": 1,
-    "playCount": 5,
+    "lastPlayed": "2017-07-11T02:36:34.235Z",
+    "audioModifier": "2",
+    "playCount": 20,
     "authorID": "212391311142158337"
   },
   {
@@ -1187,8 +1294,8 @@
     "file": "genitals.mp3",
     "dateAdded": "2017-02-14T03:04:30.201Z",
     "audioModifier": 1,
-    "playCount": 7,
-    "lastPlayed": "2017-04-30T00:27:44.515Z",
+    "playCount": 8,
+    "lastPlayed": "2017-05-20T04:55:24.246Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1200,9 +1307,9 @@
     "file": "george.mp3",
     "name": "george",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 6,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-05-29T05:12:42.832Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1215,9 +1322,9 @@
     ],
     "file": "getgot.mp3",
     "dateAdded": "2017-04-19T23:47:36.233Z",
-    "lastPlayed": "2017-04-30T00:28:09.357Z",
+    "lastPlayed": "2017-06-09T01:30:58.002Z",
     "audioModifier": 1,
-    "playCount": 6,
+    "playCount": 7,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -1236,6 +1343,19 @@
     "authorID": ""
   },
   {
+    "name": "goblin",
+    "author": "thebluepumpkin",
+    "authorID": "125288896383811584",
+    "commands": [
+      "goblin"
+    ],
+    "file": "goblin.mp3",
+    "dateAdded": "2017-06-11T03:32:01.936Z",
+    "lastPlayed": "2017-07-07T01:26:20.103Z",
+    "audioModifier": "5",
+    "playCount": 13
+  },
+  {
     "name": "gold",
     "author": "thebluepumpkin",
     "commands": [
@@ -1244,9 +1364,9 @@
     ],
     "file": "gold.mp3",
     "dateAdded": "2017-03-17T22:18:48.921Z",
-    "lastPlayed": "2017-04-30T00:35:32.304Z",
+    "lastPlayed": "2017-06-11T03:45:10.226Z",
     "audioModifier": 1,
-    "playCount": 11,
+    "playCount": 13,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -1266,6 +1386,19 @@
     "authorID": ""
   },
   {
+    "name": "goodperson",
+    "author": "Bourneidentity8",
+    "authorID": "200413362008489989",
+    "commands": [
+      "goodperson"
+    ],
+    "file": "goodperson.mp3",
+    "dateAdded": "2017-05-08T01:17:51.676Z",
+    "lastPlayed": "2017-05-08T01:17:55.682Z",
+    "audioModifier": 1,
+    "playCount": 1
+  },
+  {
     "name": "goofy",
     "commands": [
       "goofy"
@@ -1273,8 +1406,8 @@
     "file": "goofy.mp3",
     "dateAdded": "2017-02-09T23:29:04.338Z",
     "audioModifier": 1,
-    "playCount": 16,
-    "lastPlayed": "2017-05-05T04:15:29.472Z",
+    "playCount": 19,
+    "lastPlayed": "2017-05-29T23:52:20.058Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1301,9 +1434,9 @@
     "file": "GotHeem.mp3",
     "name": "GotHeem",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 6,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-04T02:01:17.897Z",
+    "lastPlayed": "2017-05-27T02:28:10.333Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1316,9 +1449,9 @@
     ],
     "file": "greatergood.mp3",
     "dateAdded": "2017-03-21T00:48:52.266Z",
-    "lastPlayed": "2017-04-28T05:55:20.390Z",
-    "audioModifier": 1,
-    "playCount": 2,
+    "lastPlayed": "2017-07-08T02:01:39.280Z",
+    "audioModifier": "2",
+    "playCount": 4,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -1330,8 +1463,8 @@
     "file": "grownman.mp3",
     "dateAdded": "2017-02-07T03:03:47.668Z",
     "audioModifier": 1,
-    "playCount": 9,
-    "lastPlayed": "2017-05-03T23:37:27.048Z",
+    "playCount": 13,
+    "lastPlayed": "2017-07-10T00:58:13.884Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1344,8 +1477,8 @@
     "file": "hacking.mp3",
     "dateAdded": "2017-03-08T02:37:17.445Z",
     "audioModifier": 1,
-    "playCount": 7,
-    "lastPlayed": "2017-04-28T05:28:31.594Z",
+    "playCount": 12,
+    "lastPlayed": "2017-07-02T02:47:40.975Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1357,9 +1490,9 @@
     "file": "hahGay.mp3",
     "name": "hahGay",
     "audioModifier": 1,
-    "playCount": 20,
+    "playCount": 21,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-02T02:29:30.310Z",
+    "lastPlayed": "2017-05-08T01:18:33.655Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1373,12 +1506,25 @@
     "file": "Hasa.mp3",
     "name": "Hasa",
     "audioModifier": 1,
-    "playCount": 8,
+    "playCount": 9,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-29T23:59:40.782Z",
+    "lastPlayed": "2017-05-20T04:10:14.264Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "hate",
+    "author": "Crashbandicunt",
+    "authorID": "212391311142158337",
+    "commands": [
+      "hate"
+    ],
+    "file": "hate.mp3",
+    "dateAdded": "2017-05-08T01:30:57.537Z",
+    "lastPlayed": "2017-05-11T03:53:44.943Z",
+    "audioModifier": 1,
+    "playCount": 4
   },
   {
     "commands": [
@@ -1402,9 +1548,9 @@
     "file": "HeMan.mp3",
     "name": "HeMan",
     "audioModifier": 1,
-    "playCount": 6,
+    "playCount": 7,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-03T02:38:48.209Z",
+    "lastPlayed": "2017-05-06T06:19:20.048Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1417,9 +1563,9 @@
     "file": "HighGround.mp3",
     "name": "HighGround",
     "audioModifier": 1,
-    "playCount": 11,
+    "playCount": 12,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-28T05:31:47.188Z",
+    "lastPlayed": "2017-05-08T03:32:56.546Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1431,12 +1577,40 @@
     "file": "himnotme.mp3",
     "name": "himnotme",
     "audioModifier": 1,
-    "playCount": 14,
+    "playCount": 16,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-06-29T02:59:46.439Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "homeimprovement",
+    "author": "thebluepumpkin",
+    "authorID": "125288896383811584",
+    "commands": [
+      "homeimprovement",
+      "grunt"
+    ],
+    "file": "homeimprovement.mp3",
+    "dateAdded": "2017-06-22T01:44:23.087Z",
+    "lastPlayed": "2017-06-29T22:45:33.026Z",
+    "audioModifier": 1,
+    "playCount": 10
+  },
+  {
+    "name": "horn",
+    "author": "thebluepumpkin",
+    "authorID": "125288896383811584",
+    "commands": [
+      "horn",
+      "priceisright"
+    ],
+    "file": "horn.mp3",
+    "dateAdded": "2017-05-27T02:31:46.660Z",
+    "lastPlayed": "2017-05-30T05:43:28.155Z",
+    "audioModifier": 1,
+    "playCount": 7
   },
   {
     "commands": [
@@ -1462,12 +1636,25 @@
     "file": "IBelieve.mp3",
     "name": "IBelieve",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 3,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-05-13T05:07:07.214Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "idiotsandwich",
+    "author": "flyingkitty",
+    "authorID": "138813284773003264",
+    "commands": [
+      "idiotsandwich"
+    ],
+    "file": "idiotsandwich.mp3",
+    "dateAdded": "2017-05-26T00:01:04.244Z",
+    "lastPlayed": "2017-05-27T00:44:13.011Z",
+    "audioModifier": 1,
+    "playCount": 5
   },
   {
     "commands": [
@@ -1490,9 +1677,9 @@
     "file": "imgay.mp3",
     "name": "imgay",
     "audioModifier": 1,
-    "playCount": 17,
+    "playCount": 19,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-02T02:29:36.990Z",
+    "lastPlayed": "2017-05-16T01:34:43.167Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1505,8 +1692,8 @@
     "file": "immafuckya.mp3",
     "dateAdded": "2017-03-01T03:05:06.196Z",
     "audioModifier": 1,
-    "playCount": 9,
-    "lastPlayed": "2017-04-27T03:24:27.302Z",
+    "playCount": 10,
+    "lastPlayed": "2017-07-11T02:41:06.717Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1519,8 +1706,8 @@
     "file": "isp.mp3",
     "dateAdded": "2017-01-27T01:18:22.111Z",
     "audioModifier": 1,
-    "playCount": 20,
-    "lastPlayed": "2017-04-28T05:27:31.498Z",
+    "playCount": 22,
+    "lastPlayed": "2017-07-11T00:54:06.049Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1533,9 +1720,9 @@
     "file": "itsworking.mp3",
     "name": "itsworking",
     "audioModifier": 1,
-    "playCount": 4,
+    "playCount": 6,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-10T00:07:16.261Z",
+    "lastPlayed": "2017-07-11T03:55:41.664Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1548,8 +1735,8 @@
     "file": "jazz.mp3",
     "dateAdded": "2017-01-23T19:11:52.359Z",
     "audioModifier": 1,
-    "playCount": 9,
-    "lastPlayed": "2017-04-30T03:06:26.031Z",
+    "playCount": 13,
+    "lastPlayed": "2017-05-19T03:12:04.914Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1568,6 +1755,19 @@
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "kermit",
+    "author": "thebluepumpkin",
+    "authorID": "125288896383811584",
+    "commands": [
+      "kermit"
+    ],
+    "file": "kermit.mp3",
+    "dateAdded": "2017-06-01T22:43:25.376Z",
+    "lastPlayed": "2017-06-20T00:46:17.413Z",
+    "audioModifier": 1,
+    "playCount": 16
   },
   {
     "commands": [
@@ -1607,9 +1807,9 @@
     ],
     "file": "killurself2.mp3",
     "dateAdded": "2017-03-14T05:36:01.146Z",
-    "lastPlayed": "2017-05-02T02:29:00.301Z",
+    "lastPlayed": "2017-05-22T20:47:04.720Z",
     "audioModifier": 1,
-    "playCount": 11,
+    "playCount": 14,
     "archived": false,
     "authorID": "135937763429056513"
   },
@@ -1622,8 +1822,8 @@
     "file": "knife.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 21,
-    "lastPlayed": "2017-05-04T19:38:19.694Z",
+    "playCount": 23,
+    "lastPlayed": "2017-05-29T05:12:04.999Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1650,8 +1850,8 @@
     "file": "leedle.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 19,
-    "lastPlayed": "2017-04-28T05:30:03.159Z",
+    "playCount": 21,
+    "lastPlayed": "2017-05-27T02:24:12.696Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1664,9 +1864,9 @@
     ],
     "file": "lemmesmash.mp3",
     "dateAdded": "2017-03-16T00:06:48.395Z",
-    "lastPlayed": "2017-05-04T19:20:31.030Z",
+    "lastPlayed": "2017-07-10T01:00:17.576Z",
     "audioModifier": 1,
-    "playCount": 19,
+    "playCount": 21,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -1706,8 +1906,8 @@
     "file": "loser.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 10,
-    "lastPlayed": "2017-04-14T02:31:11.386Z",
+    "playCount": 11,
+    "lastPlayed": "2017-05-06T06:14:59.041Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1719,9 +1919,9 @@
     "file": "magnumdong.mp3",
     "name": "magnumdong",
     "audioModifier": 1,
-    "playCount": 9,
+    "playCount": 12,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-05-27T02:28:34.855Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1735,8 +1935,8 @@
     "file": "magnumdong2.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 9,
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "playCount": 11,
+    "lastPlayed": "2017-05-27T02:28:24.295Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1749,8 +1949,8 @@
     "file": "milhouse.mp3",
     "dateAdded": "2016-12-13T21:30:17.567Z",
     "audioModifier": 1,
-    "playCount": 6,
-    "lastPlayed": "2017-04-09T23:41:30.764Z",
+    "playCount": 8,
+    "lastPlayed": "2017-05-13T06:28:25.518Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1762,9 +1962,9 @@
     "file": "milk.mp3",
     "name": "milk",
     "audioModifier": 1,
-    "playCount": 12,
+    "playCount": 13,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-04T19:18:58.904Z",
+    "lastPlayed": "2017-05-27T02:25:05.818Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1778,8 +1978,8 @@
     "file": "myHouse.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 17,
-    "lastPlayed": "2017-04-28T05:30:47.715Z",
+    "playCount": 18,
+    "lastPlayed": "2017-07-09T01:03:35.885Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1806,9 +2006,9 @@
     ],
     "file": "neverknow.mp3",
     "dateAdded": "2017-04-19T23:42:13.779Z",
-    "lastPlayed": "2017-04-20T02:12:37.621Z",
+    "lastPlayed": "2017-07-02T03:29:15.075Z",
     "audioModifier": 1,
-    "playCount": 4,
+    "playCount": 7,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -1819,9 +2019,9 @@
     "file": "neversurrender.mp3",
     "name": "neversurrender",
     "audioModifier": 1,
-    "playCount": 13,
+    "playCount": 16,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-04T19:20:58.383Z",
+    "lastPlayed": "2017-07-11T01:45:53.590Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1848,9 +2048,9 @@
     ],
     "file": "nice.mp3",
     "dateAdded": "2017-03-21T23:44:27.828Z",
-    "lastPlayed": "2017-04-30T00:26:37.822Z",
-    "audioModifier": 1,
-    "playCount": 2,
+    "lastPlayed": "2017-07-10T00:33:33.922Z",
+    "audioModifier": "4",
+    "playCount": 4,
     "archived": false,
     "authorID": "138813284773003264"
   },
@@ -1862,8 +2062,8 @@
     "file": "no.mp3",
     "dateAdded": "2017-02-11T01:36:10.972Z",
     "audioModifier": 1,
-    "playCount": 17,
-    "lastPlayed": "2017-04-30T05:01:47.952Z",
+    "playCount": 21,
+    "lastPlayed": "2017-05-08T01:19:12.115Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1876,8 +2076,8 @@
     "file": "no3.mp3",
     "dateAdded": "2017-02-25T05:38:41.693Z",
     "audioModifier": 1,
-    "playCount": 18,
-    "lastPlayed": "2017-04-30T05:01:40.979Z",
+    "playCount": 22,
+    "lastPlayed": "2017-05-08T01:12:33.346Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1890,9 +2090,9 @@
     ],
     "file": "no4.mp3",
     "dateAdded": "2017-03-14T05:39:06.576Z",
-    "lastPlayed": "2017-04-30T05:01:28.871Z",
+    "lastPlayed": "2017-05-20T22:48:33.422Z",
     "audioModifier": 1,
-    "playCount": 11,
+    "playCount": 15,
     "archived": false,
     "authorID": "135937763429056513"
   },
@@ -1905,8 +2105,8 @@
     "file": "NoLuke.mp3",
     "dateAdded": "2017-02-11T01:38:09.230Z",
     "audioModifier": 1,
-    "playCount": 19,
-    "lastPlayed": "2017-05-03T23:37:53.019Z",
+    "playCount": 21,
+    "lastPlayed": "2017-05-06T06:17:13.066Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1919,9 +2119,9 @@
     "file": "nootnoot.mp3",
     "name": "nootnoot",
     "audioModifier": 1,
-    "playCount": 10,
+    "playCount": 12,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-29T05:26:25.673Z",
+    "lastPlayed": "2017-05-29T05:13:45.332Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -1934,9 +2134,9 @@
     ],
     "file": "noron.mp3",
     "dateAdded": "2017-03-17T00:38:34.783Z",
-    "lastPlayed": "2017-05-05T03:52:38.691Z",
+    "lastPlayed": "2017-07-10T01:51:42.544Z",
     "audioModifier": 1,
-    "playCount": 12,
+    "playCount": 19,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -1971,6 +2171,19 @@
     "authorID": ""
   },
   {
+    "name": "nothing",
+    "author": "Crashbandicunt",
+    "authorID": "212391311142158337",
+    "commands": [
+      "nothing"
+    ],
+    "file": "nothing.mp3",
+    "dateAdded": "2017-07-09T01:47:09.548Z",
+    "lastPlayed": "2017-07-11T00:05:39.148Z",
+    "audioModifier": 1,
+    "playCount": 3
+  },
+  {
     "commands": [
       "NoTime",
       "NoTimeForThat"
@@ -1978,9 +2191,9 @@
     "file": "NoTime.mp3",
     "name": "NoTime",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 6,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-20T01:43:38.028Z",
+    "lastPlayed": "2017-05-29T05:11:12.020Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2030,6 +2243,19 @@
     "authorID": ""
   },
   {
+    "name": "numanuma",
+    "author": "martel",
+    "authorID": "136634823824375808",
+    "commands": [
+      "numanuma"
+    ],
+    "file": "numanuma.mp3",
+    "dateAdded": "2017-05-28T15:15:31.975Z",
+    "lastPlayed": "2017-05-28T19:40:40.883Z",
+    "audioModifier": 1,
+    "playCount": 3
+  },
+  {
     "name": "nuts",
     "author": "Crashbandicunt",
     "commands": [
@@ -2037,9 +2263,9 @@
     ],
     "file": "nuts.mp3",
     "dateAdded": "2017-03-21T23:31:05.472Z",
-    "lastPlayed": "2017-04-27T00:36:30.906Z",
+    "lastPlayed": "2017-06-30T02:25:18.867Z",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 4,
     "archived": false,
     "authorID": "212391311142158337"
   },
@@ -2051,8 +2277,8 @@
     "file": "nutshack.mp3",
     "dateAdded": "2017-01-27T02:38:20.303Z",
     "audioModifier": 1,
-    "playCount": 8,
-    "lastPlayed": "2017-05-02T02:30:22.729Z",
+    "playCount": 9,
+    "lastPlayed": "2017-05-12T06:42:59.783Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2094,8 +2320,8 @@
     "file": "ohhimark.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 11,
-    "lastPlayed": "2017-04-30T20:07:33.171Z",
+    "playCount": 12,
+    "lastPlayed": "2017-05-16T01:11:01.680Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2150,8 +2376,8 @@
     "file": "paperplanes.mp3",
     "dateAdded": "2017-01-16T05:31:14.902Z",
     "audioModifier": 1,
-    "playCount": 7,
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "playCount": 9,
+    "lastPlayed": "2017-06-11T03:43:02.402Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2164,8 +2390,8 @@
     "file": "patrick.mp3",
     "dateAdded": "2017-02-19T03:30:39.075Z",
     "audioModifier": 1,
-    "playCount": 7,
-    "lastPlayed": "2017-05-01T19:24:54.412Z",
+    "playCount": 9,
+    "lastPlayed": "2017-05-22T21:13:50.590Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2178,8 +2404,8 @@
     "file": "pgood.mp3",
     "dateAdded": "2017-02-05T04:20:42.271Z",
     "audioModifier": 1,
-    "playCount": 13,
-    "lastPlayed": "2017-03-22T00:22:31.194Z",
+    "playCount": 15,
+    "lastPlayed": "2017-07-10T03:46:21.213Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2192,8 +2418,8 @@
     "file": "pirate.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 23,
-    "lastPlayed": "2017-05-04T19:37:24.549Z",
+    "playCount": 24,
+    "lastPlayed": "2017-05-29T05:14:30.231Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2220,9 +2446,9 @@
     "file": "pop.mp3",
     "name": "pop",
     "audioModifier": 1,
-    "playCount": 11,
+    "playCount": 12,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-03-14T06:37:34.754Z",
+    "lastPlayed": "2017-05-20T04:31:43.194Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2267,8 +2493,8 @@
     "file": "price.mp3",
     "dateAdded": "2017-01-18T03:35:50.430Z",
     "audioModifier": 1,
-    "playCount": 6,
-    "lastPlayed": "2017-04-30T00:35:42.333Z",
+    "playCount": 7,
+    "lastPlayed": "2017-05-29T05:12:27.989Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2302,6 +2528,46 @@
     "authorID": ""
   },
   {
+    "name": "raw",
+    "author": "flyingkitty",
+    "authorID": "138813284773003264",
+    "commands": [
+      "raw"
+    ],
+    "file": "raw.mp3",
+    "dateAdded": "2017-05-25T23:59:30.267Z",
+    "lastPlayed": "2017-05-28T19:40:53.282Z",
+    "audioModifier": 1,
+    "playCount": 5
+  },
+  {
+    "name": "redboy",
+    "author": "arjohn cena",
+    "authorID": "135936099011788800",
+    "commands": [
+      "redboy"
+    ],
+    "file": "redboy.mp3",
+    "dateAdded": "2017-05-28T04:58:06.923Z",
+    "lastPlayed": "2017-07-08T02:02:07.788Z",
+    "audioModifier": 1,
+    "playCount": 18
+  },
+  {
+    "name": "reddogofwisdom",
+    "author": "arjohn cena",
+    "authorID": "135936099011788800",
+    "commands": [
+      "reddogofwisdom",
+      "rdow"
+    ],
+    "file": "reddogofwisdom.mp3",
+    "dateAdded": "2017-06-09T01:04:29.757Z",
+    "lastPlayed": "2017-06-20T00:46:06.228Z",
+    "audioModifier": 1,
+    "playCount": 3
+  },
+  {
     "commands": [
       "ricefields"
     ],
@@ -2324,9 +2590,9 @@
     "file": "Richard.mp3",
     "name": "Richard",
     "audioModifier": 1,
-    "playCount": 6,
+    "playCount": 7,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-05-08T01:20:02.569Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2352,9 +2618,9 @@
     "file": "robotfanfic.mp3",
     "name": "robotfanfic",
     "audioModifier": 1,
-    "playCount": 21,
+    "playCount": 23,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-28T05:26:34.468Z",
+    "lastPlayed": "2017-05-20T05:25:17.840Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2367,9 +2633,9 @@
     "file": "rushhour.mp3",
     "name": "rushhour",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 6,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-05-09T06:17:19.889Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2381,9 +2647,9 @@
     ],
     "file": "sam.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "audioModifier": 1,
-    "playCount": 12,
-    "lastPlayed": "2017-04-08T23:51:07.283Z",
+    "audioModifier": "2.5",
+    "playCount": 17,
+    "lastPlayed": "2017-07-09T19:24:49.695Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2394,10 +2660,10 @@
     ],
     "file": "sand.mp3",
     "name": "sand",
-    "audioModifier": "5",
-    "playCount": 13,
+    "audioModifier": "6",
+    "playCount": 16,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-05T05:40:27.147Z",
+    "lastPlayed": "2017-05-20T04:33:50.067Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2410,8 +2676,8 @@
     "file": "sasuke.mp3",
     "dateAdded": "2016-12-21T06:45:03.761Z",
     "audioModifier": 1,
-    "playCount": 17,
-    "lastPlayed": "2017-05-05T04:31:22.700Z",
+    "playCount": 18,
+    "lastPlayed": "2017-05-20T04:09:55.784Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2439,10 +2705,23 @@
     ],
     "file": "secrettunnel.mp3",
     "dateAdded": "2017-05-05T04:19:34.476Z",
-    "lastPlayed": "2017-05-05T04:19:36.515Z",
+    "lastPlayed": "2017-05-27T02:25:12.298Z",
     "audioModifier": 1,
-    "playCount": 1,
+    "playCount": 4,
     "authorID": "135936099011788800"
+  },
+  {
+    "name": "senate",
+    "author": "Bourneidentity8",
+    "authorID": "200413362008489989",
+    "commands": [
+      "senate"
+    ],
+    "file": "senate.mp3",
+    "dateAdded": "2017-05-08T04:03:13.741Z",
+    "lastPlayed": "2017-05-20T04:08:01.456Z",
+    "audioModifier": "4",
+    "playCount": 3
   },
   {
     "name": "sendit",
@@ -2452,9 +2731,9 @@
     ],
     "file": "sendit.mp3",
     "dateAdded": "2017-03-18T03:12:23.911Z",
-    "lastPlayed": "2017-04-30T03:04:05.537Z",
+    "lastPlayed": "2017-07-09T00:52:52.239Z",
     "audioModifier": 1,
-    "playCount": 15,
+    "playCount": 16,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -2509,8 +2788,8 @@
     "file": "shoes.mp3",
     "dateAdded": "2017-01-16T05:11:13.848Z",
     "audioModifier": 1,
-    "playCount": 5,
-    "lastPlayed": "2017-04-28T05:57:26.885Z",
+    "playCount": 6,
+    "lastPlayed": "2017-05-27T02:23:30.150Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2523,8 +2802,8 @@
     "file": "shremix.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 13,
-    "lastPlayed": "2017-04-30T00:33:07.236Z",
+    "playCount": 14,
+    "lastPlayed": "2017-05-13T06:36:10.296Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2537,8 +2816,8 @@
     "file": "shuckyducky.mp3",
     "dateAdded": "2017-02-20T02:44:32.621Z",
     "audioModifier": 1,
-    "playCount": 4,
-    "lastPlayed": "2017-05-05T04:31:12.318Z",
+    "playCount": 5,
+    "lastPlayed": "2017-07-09T01:50:48.217Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2567,9 +2846,9 @@
     "file": "sicker.mp3",
     "name": "sicker",
     "audioModifier": 1,
-    "playCount": 8,
+    "playCount": 10,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-07-09T01:51:32.257Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2582,9 +2861,9 @@
     ],
     "file": "slam.mp3",
     "dateAdded": "2017-04-04T01:50:08.700Z",
-    "lastPlayed": "2017-05-05T05:38:54.295Z",
+    "lastPlayed": "2017-05-11T04:36:25.894Z",
     "audioModifier": 1,
-    "playCount": 11,
+    "playCount": 13,
     "archived": false,
     "authorID": "135936099011788800"
   },
@@ -2597,9 +2876,9 @@
     "file": "smokeweed.mp3",
     "name": "smokeweed",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 8,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-30T03:58:35.233Z",
+    "lastPlayed": "2017-05-21T05:02:34.537Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2611,9 +2890,9 @@
     "file": "SMOrc.mp3",
     "name": "SMOrc",
     "audioModifier": 1,
-    "playCount": 24,
+    "playCount": 29,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-04T02:04:52.185Z",
+    "lastPlayed": "2017-07-08T02:00:43.188Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2668,8 +2947,8 @@
     "file": "spoon.mp3",
     "dateAdded": "2017-01-13T03:17:01.818Z",
     "audioModifier": 1,
-    "playCount": 11,
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "playCount": 12,
+    "lastPlayed": "2017-05-29T05:12:16.256Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2683,9 +2962,9 @@
     ],
     "file": "stars.mp3",
     "dateAdded": "2017-03-14T05:49:02.615Z",
-    "lastPlayed": "2017-05-04T19:37:45.530Z",
+    "lastPlayed": "2017-05-21T03:54:21.643Z",
     "audioModifier": 1,
-    "playCount": 7,
+    "playCount": 8,
     "archived": false,
     "authorID": "135936099011788800"
   },
@@ -2698,8 +2977,8 @@
     "file": "starve.mp3",
     "dateAdded": "2017-03-14T02:22:12.267Z",
     "audioModifier": 1,
-    "playCount": 4,
-    "lastPlayed": "2017-04-30T00:37:02.225Z",
+    "playCount": 5,
+    "lastPlayed": "2017-05-19T03:14:07.273Z",
     "archived": false,
     "authorID": ""
   },
@@ -2726,8 +3005,8 @@
     "file": "stfu.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 19,
-    "lastPlayed": "2017-04-28T05:27:58.491Z",
+    "playCount": 22,
+    "lastPlayed": "2017-05-22T20:46:38.874Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2754,9 +3033,9 @@
     ],
     "file": "sumfuk.mp3",
     "dateAdded": "2017-03-16T00:04:17.870Z",
-    "lastPlayed": "2017-05-04T19:38:23.050Z",
+    "lastPlayed": "2017-07-09T01:05:39.176Z",
     "audioModifier": 1,
-    "playCount": 12,
+    "playCount": 14,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -2768,9 +3047,9 @@
     ],
     "file": "superfightingrobot.mp3",
     "dateAdded": "2017-03-16T04:05:39.574Z",
-    "lastPlayed": "2017-05-04T19:14:37.852Z",
+    "lastPlayed": "2017-07-09T00:42:36.951Z",
     "audioModifier": 1,
-    "playCount": 6,
+    "playCount": 8,
     "archived": false,
     "authorID": "200410336455688192"
   },
@@ -2782,9 +3061,9 @@
     "file": "supergay.mp3",
     "name": "supergay",
     "audioModifier": 1,
-    "playCount": 21,
+    "playCount": 23,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-30T03:42:06.454Z",
+    "lastPlayed": "2017-05-29T05:11:43.710Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2797,9 +3076,9 @@
     "file": "supersuit.mp3",
     "name": "supersuit",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 6,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-06-13T01:16:45.249Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2826,10 +3105,10 @@
     ],
     "file": "thatskindagay.mp3",
     "name": "thatskindagay",
-    "audioModifier": 1,
-    "playCount": 12,
+    "audioModifier": "2",
+    "playCount": 25,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-05T04:27:55.600Z",
+    "lastPlayed": "2017-07-08T02:00:27.046Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2843,8 +3122,8 @@
     "file": "theworst.mp3",
     "dateAdded": "2016-12-18T03:26:55.729Z",
     "audioModifier": 1,
-    "playCount": 8,
-    "lastPlayed": "2017-04-27T04:43:58.572Z",
+    "playCount": 12,
+    "lastPlayed": "2017-07-09T01:05:02.708Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2870,9 +3149,9 @@
     "file": "ThisGirlIsOnFire.mp3",
     "name": "ThisGirlIsOnFire",
     "audioModifier": 1,
-    "playCount": 5,
+    "playCount": 7,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-03-22T00:21:59.040Z",
+    "lastPlayed": "2017-05-06T05:49:36.776Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2900,9 +3179,9 @@
     "file": "timeToStop.mp3",
     "name": "timeToStop",
     "audioModifier": 1,
-    "playCount": 20,
+    "playCount": 22,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-30T05:02:19.998Z",
+    "lastPlayed": "2017-05-11T03:56:26.560Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2944,8 +3223,8 @@
     "file": "totalSilence.mp3",
     "dateAdded": "2016-12-18T03:28:47.408Z",
     "audioModifier": 1,
-    "playCount": 11,
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "playCount": 12,
+    "lastPlayed": "2017-07-09T01:05:27.310Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -2980,6 +3259,34 @@
     "authorID": ""
   },
   {
+    "name": "trick",
+    "author": "SpicySultanZ",
+    "authorID": "135937763429056513",
+    "commands": [
+      "trick",
+      "trickassbitch",
+      "Ithinknot"
+    ],
+    "file": "trick.mp3",
+    "dateAdded": "2017-06-12T20:04:57.855Z",
+    "lastPlayed": "2017-06-20T02:05:46.333Z",
+    "audioModifier": 1,
+    "playCount": 10
+  },
+  {
+    "name": "tru",
+    "author": "arjohn cena",
+    "authorID": "135936099011788800",
+    "commands": [
+      "tru"
+    ],
+    "file": "tru.mp3",
+    "dateAdded": "2017-05-11T00:57:28.948Z",
+    "lastPlayed": "2017-05-12T02:42:58.460Z",
+    "audioModifier": 1,
+    "playCount": 7
+  },
+  {
     "commands": [
       "tryMeBitch"
     ],
@@ -3001,9 +3308,9 @@
     "file": "Tunak.mp3",
     "name": "Tunak",
     "audioModifier": 1,
-    "playCount": 4,
+    "playCount": 5,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-28T05:32:55.847Z",
+    "lastPlayed": "2017-05-06T05:50:00.901Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3016,8 +3323,8 @@
     "file": "turkishprison.mp3",
     "dateAdded": "2017-02-07T03:01:54.695Z",
     "audioModifier": 1,
-    "playCount": 6,
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "playCount": 7,
+    "lastPlayed": "2017-07-10T00:57:53.549Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3060,9 +3367,9 @@
     "file": "Unique.mp3",
     "name": "Unique",
     "audioModifier": 1,
-    "playCount": 7,
+    "playCount": 8,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-30T04:58:36.667Z",
+    "lastPlayed": "2017-07-09T01:47:56.770Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3073,10 +3380,10 @@
     ],
     "file": "UnlimitedPower.mp3",
     "name": "UnlimitedPower",
-    "audioModifier": 1,
-    "playCount": 4,
+    "audioModifier": "3",
+    "playCount": 12,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-03-17T01:29:20.318Z",
+    "lastPlayed": "2017-07-02T03:28:59.454Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3089,11 +3396,24 @@
     "file": "vagina.mp3",
     "dateAdded": "2017-03-08T02:37:45.344Z",
     "audioModifier": 1,
-    "playCount": 4,
-    "lastPlayed": "2017-04-26T07:50:20.892Z",
+    "playCount": 6,
+    "lastPlayed": "2017-07-06T23:31:48.996Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "vikings",
+    "author": "Crashbandicunt",
+    "authorID": "212391311142158337",
+    "commands": [
+      "vikings"
+    ],
+    "file": "vikings.mp3",
+    "dateAdded": "2017-06-30T01:40:47.120Z",
+    "lastPlayed": "2017-07-06T23:31:32.824Z",
+    "audioModifier": 1,
+    "playCount": 4
   },
   {
     "name": "vn",
@@ -3103,8 +3423,8 @@
     "file": "vn.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 14,
-    "lastPlayed": "2017-04-27T00:02:15.291Z",
+    "playCount": 15,
+    "lastPlayed": "2017-05-08T01:13:21.000Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3132,8 +3452,8 @@
     "file": "waffles.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 8,
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "playCount": 10,
+    "lastPlayed": "2017-05-06T06:19:55.443Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3145,9 +3465,9 @@
     "file": "wakemeup.mp3",
     "name": "wakemeup",
     "audioModifier": 1,
-    "playCount": 15,
+    "playCount": 16,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-05-05T04:15:38.195Z",
+    "lastPlayed": "2017-05-27T02:29:12.989Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3161,9 +3481,9 @@
     ],
     "file": "water.mp3",
     "dateAdded": "2017-03-16T00:09:22.073Z",
-    "lastPlayed": "2017-04-28T05:36:36.970Z",
+    "lastPlayed": "2017-06-26T23:49:49.260Z",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 3,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -3176,12 +3496,27 @@
     "file": "wearenumber1.mp3",
     "name": "wearenumber1",
     "audioModifier": 1,
-    "playCount": 7,
+    "playCount": 8,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "1970-01-01T00:00:00.000Z",
+    "lastPlayed": "2017-07-09T01:04:38.264Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
+  },
+  {
+    "name": "welcome",
+    "author": "SpicySultanZ",
+    "authorID": "135937763429056513",
+    "commands": [
+      "welcome",
+      "nutsack",
+      "knights"
+    ],
+    "file": "welcome.mp3",
+    "dateAdded": "2017-06-14T21:10:09.677Z",
+    "lastPlayed": "2017-06-20T02:05:02.924Z",
+    "audioModifier": 1,
+    "playCount": 10
   },
   {
     "commands": [
@@ -3190,9 +3525,9 @@
     "file": "whatareyoudoing.mp3",
     "name": "whatareyoudoing",
     "audioModifier": 1,
-    "playCount": 3,
+    "playCount": 4,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-28T05:55:33.799Z",
+    "lastPlayed": "2017-06-29T03:00:02.891Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3204,9 +3539,9 @@
     "file": "whatrudoing.mp3",
     "name": "whatrudoing",
     "audioModifier": 1,
-    "playCount": 8,
+    "playCount": 9,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-20T00:48:48.745Z",
+    "lastPlayed": "2017-07-09T00:43:50.764Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3219,8 +3554,8 @@
     "file": "whatrugay.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 12,
-    "lastPlayed": "2017-05-02T02:29:43.071Z",
+    "playCount": 13,
+    "lastPlayed": "2017-05-16T01:34:48.158Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3294,9 +3629,9 @@
     ],
     "file": "why.mp3",
     "dateAdded": "2017-03-14T05:31:37.759Z",
-    "lastPlayed": "2017-04-08T17:49:00.496Z",
+    "lastPlayed": "2017-07-11T03:57:58.628Z",
     "audioModifier": 1,
-    "playCount": 10,
+    "playCount": 14,
     "archived": false,
     "authorID": "135937763429056513"
   },
@@ -3322,9 +3657,9 @@
     ],
     "file": "withoutcosby.mp3",
     "dateAdded": "2017-03-21T00:12:39.037Z",
-    "lastPlayed": "2017-04-28T05:35:52.354Z",
+    "lastPlayed": "2017-07-11T00:35:54.461Z",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 4,
     "archived": false,
     "authorID": "200413362008489989"
   },
@@ -3351,9 +3686,9 @@
     ],
     "file": "wontgetfined.mp3",
     "dateAdded": "2017-04-28T06:15:52.437Z",
-    "lastPlayed": "2017-04-30T03:04:47.165Z",
+    "lastPlayed": "2017-07-08T02:04:51.890Z",
     "audioModifier": 1,
-    "playCount": 6,
+    "playCount": 7,
     "authorID": "135936099011788800"
   },
   {
@@ -3380,8 +3715,8 @@
     "file": "wrestle.mp3",
     "dateAdded": "2017-03-06T02:14:15.714Z",
     "audioModifier": 1,
-    "playCount": 18,
-    "lastPlayed": "2017-05-01T19:30:13.412Z",
+    "playCount": 24,
+    "lastPlayed": "2017-07-11T03:05:38.591Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3395,8 +3730,8 @@
     "file": "wrongnumber.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 12,
-    "lastPlayed": "2017-04-11T01:30:51.659Z",
+    "playCount": 13,
+    "lastPlayed": "2017-05-20T02:08:22.454Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3408,9 +3743,9 @@
     "file": "wtf.mp3",
     "name": "wtf",
     "audioModifier": 1,
-    "playCount": 13,
+    "playCount": 14,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-22T04:35:39.870Z",
+    "lastPlayed": "2017-05-08T01:27:00.288Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3437,9 +3772,9 @@
     "file": "xfiles.mp3",
     "name": "xfiles",
     "audioModifier": 1,
-    "playCount": 7,
+    "playCount": 8,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-03-14T06:24:57.426Z",
+    "lastPlayed": "2017-05-12T06:42:01.635Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3460,6 +3795,20 @@
     "authorID": ""
   },
   {
+    "name": "yeahboy",
+    "author": "SpicySultanZ",
+    "authorID": "135937763429056513",
+    "commands": [
+      "yeahboy",
+      "longestyeahboy"
+    ],
+    "file": "yeahboy.mp3",
+    "dateAdded": "2017-05-26T15:07:01.861Z",
+    "lastPlayed": "2017-05-30T05:44:00.448Z",
+    "audioModifier": 1,
+    "playCount": 4
+  },
+  {
     "name": "yee",
     "author": "thebluepumpkin",
     "commands": [
@@ -3467,9 +3816,9 @@
     ],
     "file": "yee.mp3",
     "dateAdded": "2017-03-21T00:17:43.738Z",
-    "lastPlayed": "2017-04-28T05:54:40.405Z",
+    "lastPlayed": "2017-07-09T01:48:34.620Z",
     "audioModifier": 1,
-    "playCount": 2,
+    "playCount": 4,
     "archived": false,
     "authorID": "125288896383811584"
   },
@@ -3481,8 +3830,8 @@
     "file": "yes.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 40,
-    "lastPlayed": "2017-04-30T05:01:18.884Z",
+    "playCount": 47,
+    "lastPlayed": "2017-06-22T02:16:28.745Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3495,8 +3844,8 @@
     "file": "yes2.mp3",
     "dateAdded": "2017-02-23T01:03:54.527Z",
     "audioModifier": 1,
-    "playCount": 19,
-    "lastPlayed": "2017-04-28T05:25:20.684Z",
+    "playCount": 22,
+    "lastPlayed": "2017-05-08T04:42:11.617Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3509,8 +3858,8 @@
     "file": "yes3.mp3",
     "dateAdded": "2017-02-23T01:05:09.448Z",
     "audioModifier": 1,
-    "playCount": 26,
-    "lastPlayed": "2017-04-30T05:02:15.765Z",
+    "playCount": 28,
+    "lastPlayed": "2017-05-08T01:19:31.627Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3523,8 +3872,8 @@
     "file": "yes4.mp3",
     "dateAdded": "2017-02-23T01:07:42.734Z",
     "audioModifier": 1,
-    "playCount": 22,
-    "lastPlayed": "2017-04-30T05:02:26.916Z",
+    "playCount": 23,
+    "lastPlayed": "2017-05-06T06:12:38.763Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3537,9 +3886,9 @@
     ],
     "file": "yes5.mp3",
     "dateAdded": "2017-03-14T05:18:01.787Z",
-    "lastPlayed": "2017-04-30T05:02:09.853Z",
+    "lastPlayed": "2017-05-06T06:12:44.096Z",
     "audioModifier": 1,
-    "playCount": 16,
+    "playCount": 17,
     "archived": false,
     "authorID": "135937763429056513"
   },
@@ -3551,9 +3900,9 @@
     ],
     "file": "yes6.mp3",
     "dateAdded": "2017-04-02T03:28:35.713Z",
-    "lastPlayed": "2017-04-30T05:02:04.603Z",
+    "lastPlayed": "2017-05-06T06:12:48.487Z",
     "audioModifier": 1,
-    "playCount": 10,
+    "playCount": 11,
     "archived": false,
     "authorID": "135936099011788800"
   },
@@ -3578,9 +3927,9 @@
     "file": "youngmetro.mp3",
     "name": "youngmetro",
     "audioModifier": 1,
-    "playCount": 8,
+    "playCount": 9,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-30T00:33:32.315Z",
+    "lastPlayed": "2017-05-20T04:09:47.334Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3592,9 +3941,9 @@
     "file": "YouUnderestimateMyPower.mp3",
     "name": "YouUnderestimateMyPower",
     "audioModifier": 1,
-    "playCount": 8,
+    "playCount": 14,
     "dateAdded": "1970-01-01T00:00:00.000Z",
-    "lastPlayed": "2017-04-22T05:54:32.871Z",
+    "lastPlayed": "2017-05-29T05:11:00.429Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
@@ -3622,8 +3971,8 @@
     "file": "zack.mp3",
     "dateAdded": "1970-01-01T00:00:00.000Z",
     "audioModifier": 1,
-    "playCount": 18,
-    "lastPlayed": "2017-04-30T04:58:31.272Z",
+    "playCount": 19,
+    "lastPlayed": "2017-07-10T00:55:36.877Z",
     "author": "Unknown",
     "archived": false,
     "authorID": ""
