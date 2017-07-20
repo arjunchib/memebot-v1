@@ -60,6 +60,8 @@ client.on('message', message => {
       volume(message, words)
     } else if (command === 'vote') {
       vote(message, words)
+    } else if (command === 'alias') {
+      alias(message, words)
     } else if (command === 'airhorn') {
       return
     } else {
@@ -174,6 +176,61 @@ function remove (message, words) {
     message.channel.send('Deleted ' + words[1])
   } else {
     message.channel.send('Only the author may delete memes. Vote for a deletion with the !vote command.')
+  }
+}
+
+// ALIAS
+function alias (message, words) {
+  if (words.length < 4) {
+    displayErrorText(message)
+    return
+  }
+  let index = findIndexByCommand(words[2])
+  if (index === -1) {
+    message.channel.send('Could not find meme by name: ' + words[2])
+    displayErrorText(message)
+    return
+  }
+  var numAliases = 0
+  var aliasString = ''
+  var i = 0
+  if (words[1].toLowerCase() === 'add') {
+    for (i = 3; i < words.length; i++) {
+      if (!memes[index]['commands'].includes(words[i]) && findIndexByCommand(words[i]) < 0) {
+        memes[index]['commands'].push(words[i])
+        aliasString += (words[i] + ', ')
+        numAliases += 1
+      }
+    }
+    aliasString = aliasString.substring(0, aliasString.length - 2)
+    if (numAliases === 0) {
+      message.channel.send('No valid commands supplied for ' + memes[index]['name'])
+    } else if (numAliases === 1) {
+      message.channel.send('Added command to ' + memes[index]['name'] + ': ' + aliasString)
+    } else if (numAliases > 1) {
+      message.channel.send('Added commands to ' + memes[index]['name'] + ': ' + aliasString)
+    }
+    saveMemes()
+  } else if (words[1].toLowerCase() === 'remove') {
+    for (i = 3; i < words.length; i++) {
+      if (memes[index]['commands'].includes(words[i]) && words[i].toLowerCase() !== memes[index]['name'].toLowerCase()) {
+        var commandIndex = memes[index]['commands'].indexOf(words[i])
+        memes[index]['commands'].splice(commandIndex, 1)
+        aliasString += (words[i] + ', ')
+        numAliases += 1
+      }
+    }
+    aliasString = aliasString.substring(0, aliasString.length - 2)
+    if (numAliases === 0) {
+      message.channel.send('No valid commands supplied for ' + memes[index]['name'])
+    } else if (numAliases === 1) {
+      message.channel.send('Removed command from ' + memes[index]['name'] + ': ' + aliasString)
+    } else if (numAliases > 1) {
+      message.channel.send('Removed commands from' + memes[index]['name'] + ': ' + aliasString)
+    }
+    saveMemes()
+  } else {
+    displayErrorText(message)
   }
 }
 
