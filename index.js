@@ -165,6 +165,10 @@ function add (message, words) {
 
 // REMOVE
 function remove (message, words) {
+  if (words.length < 2) {
+    displayErrorText(message)
+    return
+  }
   let index = findIndexByCommand(words[1])
   if (index === -1) {
     message.channel.send('Could not find meme by name: ' + words[1])
@@ -303,7 +307,7 @@ function list (message, words) {
 // HELP
 function help (message) {
   const helpText =
-  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/newest/oldest/archives/votes/all]\nA list of memes. If no modifier is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!volume [meme] [audio modifier]\nSets an audio modifier for the meme, such that 0.5 is half the normal volume and 2.0 is twice the normal volume. Only the person who added the meme may change its volume.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```'
+  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/newest/oldest/archives/votes/all]\nA list of memes. If no modifier is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!volume [meme] [audio modifier]\nSets an audio modifier for the meme, such that 0.5 is half the normal volume and 2.0 is twice the normal volume.\n\n!alias [add/remove] [meme] [command 1, command 2, ...]\nAdds or removes commands for the meme. Cannot remove the first command given to the meme.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```'
   message.channel.send(helpText)
 }
 
@@ -373,14 +377,10 @@ function volume (message, words) {
     message.channel.send('Could not find meme by name: ' + words[1])
     return
   }
-  if (hasAccess(memes[index], message.author)) {
-    memes[index]['audioModifier'] = audioModifier
-    saveMemes()
-    message.channel.send('The audio modifier of ' + memeInput + ' has been set to: ' + audioModifier)
-    debug('Audio modifier of ' + memes[index]['name'] + ' set to ' + audioModifier)
-  } else {
-    message.channel.send('Only the author may modify memes. Contact ' + memes[index]['author'] + ' to change volume.')
-  }
+  memes[index]['audioModifier'] = audioModifier
+  saveMemes()
+  message.channel.send('The audio modifier of ' + memeInput + ' has been set to: ' + audioModifier)
+  debug('Audio modifier of ' + memes[index]['name'] + ' set to ' + audioModifier)
 }
 
 // NATURALIZE
