@@ -351,8 +351,10 @@ function random (message, words) {
   if (memes[randomIndex]['archived']) {
     random(message, words)
   } else {
+    if (!isPlaying) {
+      message.channel.send('Playing ' + memes[randomIndex]['name'])
+    }
     playMeme(memes[randomIndex], message.member.voiceChannel, true)
-    message.channel.send('Playing ' + memes[randomIndex]['name'])
   }
 }
 
