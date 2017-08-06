@@ -2,11 +2,8 @@ var fs = require('fs')
 
 var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
 
-// var d = new Date(0)
 for (let i = 0; i < memes.length; i++) {
-  if (memes[i]['archived'] == null) {
-    memes[i]['archived'] = false
-  }
+  // Code to modify memes.json
 }
 saveMemes()
 
