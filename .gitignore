@@ -1,3 +1,5 @@
 .sync-config.cson
 old_index.js
 *.log
+audio/
+node_modules/

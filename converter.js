@@ -16,5 +16,5 @@ function compareMemes (a, b) {
 
 function saveMemes () {
   memes.sort(compareMemes)
-  fs.writeFileSync('memes_converted.json', JSON.stringify(memes, null, 2))
+  fs.writeFileSync('memes-converted.json', JSON.stringify(memes, null, 2))
 }

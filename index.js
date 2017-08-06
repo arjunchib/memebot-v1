@@ -683,7 +683,7 @@ function debug (msg) {
   let d = new Date()
   let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
   msg = '[' + timeString + '] ' + msg + '\n'
-  fs.appendFile('debug.log', msg, function (err) {
+  fs.appendFile('logs/debug.log', msg, function (err) {
     if (err) {
       return console.log(err)
     }
