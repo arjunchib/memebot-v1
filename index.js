@@ -278,6 +278,10 @@ function list (message, words) {
   } else {
     for (let i = 0; i < citizens.length; i++) {
       for (let vote in citizens[i]['votes']) {
+        let index = findIndexByCommand(vote)
+        if (memes[index]['archived']) {
+          vote += '*'
+        }
         list.push(vote)
       }
     }
@@ -404,7 +408,7 @@ function naturalize (message, words) {
 
 // VOTE
 function vote (message, words) {
-  if (words.length < 3) {
+  if (words.length < 2) {
     displayErrorText(message)
     return
   }
@@ -416,33 +420,34 @@ function vote (message, words) {
     return
   }
 
+  let memeName = memes[index]['name']
+  let memeArchived = memes[index]['archived']
   let citizen = findCitizenByID(message.author.id)
-  if (citizen == null) {
+  if (citizen == null && words.length >= 3) {
     message.channel.send('You must naturalize to become a citizen of memebotopia')
     displayErrorText(message)
     return
-  }
-
-  let memeName = memes[index]['name']
-  let memeArchived = memes[index]['archived']
-  if (words[2] === 'for' || words[2] === 'yea') {
-    if (memeArchived) {
+  } else {
+    if (words[2] === 'for' || words[2] === 'yea') {
+      if (memeArchived) {
+        citizen['votes'][memeName] = 'keep'
+      } else {
+        citizen['votes'][memeName] = 'remove'
+      }
+    } else if (words[2] === 'against' || words[2] === 'nay') {
+      if (!memeArchived) {
+        citizen['votes'][memeName] = 'keep'
+      } else {
+        citizen['votes'][memeName] = 'remove'
+      }
+    } else if (words[2] === 'keep') {
       citizen['votes'][memeName] = 'keep'
-    } else {
+    } else if (words[2] === 'remove') {
       citizen['votes'][memeName] = 'remove'
+    } else if (words[2] === 'abstain') {
+      citizen['votes'][memeName] = 'abstain'
     }
-  } else if (words[2] === 'against' || words[2] === 'nay') {
-    if (!memeArchived) {
-      citizen['votes'][memeName] = 'keep'
-    } else {
-      citizen['votes'][memeName] = 'remove'
-    }
-  } else if (words[2] === 'keep') {
-    citizen['votes'][memeName] = 'keep'
-  } else if (words[2] === 'remove') {
-    citizen['votes'][memeName] = 'remove'
-  } else if (words[2] === 'abstain') {
-    citizen['votes'][memeName] = 'abstain'
+    saveCitizens()
   }
 
   let resolution = ''
@@ -494,7 +499,6 @@ function vote (message, words) {
     resolution += '\n' + votesNeeded + ' more yea(s) needed to pass this resolution.'
   }
 
-  saveCitizens()
   message.channel.send(resolution)
 }
 
