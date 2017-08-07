@@ -28,15 +28,15 @@ You will first need to create a new bot on your Discord account. Once you have d
 
 These installation is for unix-like environments (i.e. Linux and OSX). You may have to do more work to install on Windows.
 
-##### Installing node.js
+#### Installing node.js
 Install node.js version 6.0.0 or later. I reccomend using [nvm](https://github.com/creationix/nvm) to install and manage versions of node.
 
-##### Download repository
+#### Download repository
 ```
 git clone --bare https://github.com/arjunchib/memebot
 ```
 
-##### Install dependicies
+#### Install dependicies
 ```
 cd memebot
 npm install
@@ -44,12 +44,12 @@ npm install
 
 # Setting up environment
 
-##### Create environment file
+#### Create environment file
 ```
 nano .env
 ```
 
-##### Declare environement variables
+#### Declare environement variables
 Enter these values into your `.env` file. Only the `DISCORD_TOKEN` is required. If you do not want to have an account with admin privileges, leave out the `ADMIN_USER_ID` line (admins may remove any meme).
 ```
 DISCORD_TOKEN=<YOUR DISCORD TOKEN>
