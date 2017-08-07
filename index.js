@@ -4,9 +4,12 @@ var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
 var push = require('pushover-notifications')
 
+require('dotenv').config()
+
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
 const PUSHOVER_USER = process.env.PUSHOVER_USER
 const PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN
+const ADMIN_USER_ID = process.env.ADMIN_USER_ID
 
 const client = new Discord.Client()
 const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize', 'volume']
@@ -662,7 +665,7 @@ function removeDuplicates (a) {
 }
 
 function hasAccess (meme, author) {
-  return (author.id === '135936099011788800' || (meme['authorID'] != null && meme['authorID'] === author.id))
+  return (author.id === ADMIN_USER_ID || (meme['authorID'] != null && meme['authorID'] === author.id))
 }
 
 function saveMemes () {

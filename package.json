@@ -26,6 +26,7 @@
   "homepage": "https://github.com/arjunchib/memebot#readme",
   "dependencies": {
     "discord.js": "^11.1.0",
+    "dotenv": "^4.0.0",
     "erlpack": "github:hammerandchisel/erlpack",
     "fluent-ffmpeg": "^2.1.0",
     "libsodium-wrappers": "^0.5.1",
