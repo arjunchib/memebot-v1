@@ -3,6 +3,7 @@ var fs = require('fs')
 var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
 var push = require('pushover-notifications')
+var ArgumentParser = require('argparse').ArgumentParser
 
 require('dotenv').config()
 
@@ -16,10 +17,34 @@ const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airho
 
 var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
 var citizens = JSON.parse(fs.readFileSync('citizens.json', 'utf8'))
-var debugMode = true
 var isPlaying = false
 var blockedFile = null
+var debugMode = false
+var lordMode = false
 var pushover
+
+var parser = new ArgumentParser({
+  version: '0.1',
+  addHelp: true,
+  description: 'A Discord bot for memes'
+})
+parser.addArgument(
+  [ '-d', '--debug' ],
+  {
+    help: 'Enables logging to the console',
+    action: 'storeTrue'
+  }
+)
+parser.addArgument(
+  [ '-l', '--lord' ],
+  {
+    help: 'Allows the server to send memes to leeches',
+    action: 'storeTrue'
+  }
+)
+var args = parser.parseArgs()
+debugMode = args.debug
+lordMode = args.lord
 
 // PUSH NOTIFICATIONS
 if (PUSHOVER_USER && PUSHOVER_TOKEN) {
