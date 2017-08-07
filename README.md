@@ -42,7 +42,7 @@ cd memebot
 npm install
 ```
 
-# Setting up environment
+## Setting up environment
 
 #### Create environment file
 ```
