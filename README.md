@@ -22,21 +22,21 @@ Once installed and the server is up and running, memebot can be controlled compl
 
 ## Registering a bot with Discord
 
-You will first need to create a new bot on your Discord account. Once you have done that, you can use the app user bot token to connect to the server. Discord has made a  [guide](https://discordapp.com/developers/docs/intro "discordapp.com") to help make new bots.
+You will first need to create a new bot on your Discord account. Once you have done that, you can use the app user bot token to connect to the server. Discord has made a  [guide](https://discordapp.com/developers/docs/intro "discordapp.com") to make a new bot.
 
 ## Installation
 
 These installation is for unix-like environments (i.e. Linux and OSX). You may have to do more work to install on Windows.
 
-**Installing node.js**  
+##### Installing node.js
 Install node.js version 6.0.0 or later. I reccomend using [nvm](https://github.com/creationix/nvm) to install and manage versions of node.
 
-**Download repository**  
+##### Download repository
 ```
 git clone --bare https://github.com/arjunchib/memebot
 ```
 
-**Install dependicies**  
+##### Install dependicies
 ```
 cd memebot
 npm install
@@ -44,14 +44,13 @@ npm install
 
 # Setting up environment
 
-**Create environment file**  
-Create a .env file in the memebot directory.  
+##### Create environment file
 ```
 nano .env
 ```
 
-**Declare environement variables**  
-Enter these values into your .env file. Only the `DISCORD_TOKEN` is required. If you do not want to have an account with admin privileges, leave out the `ADMIN_USER_ID` line.
+##### Declare environement variables
+Enter these values into your `.env` file. Only the `DISCORD_TOKEN` is required. If you do not want to have an account with admin privileges, leave out the `ADMIN_USER_ID` line (admins may remove any meme).
 ```
 DISCORD_TOKEN=<YOUR DISCORD TOKEN>
 ADMIN_USER_ID=<YOUR DISCORD USER ID>
@@ -63,21 +62,22 @@ Follow this [support guide](https://support.discordapp.com/hc/en-us/articles/206
 
 ## Running Memebot
 
-In the memebot directory run
+To start the server, in the memebot directory run
 ```
 node index.js
 ```
 
 To stop the server enter `Ctrl-C`
 
-I reccomend using [screen](https://www.linode.com/docs/networking/ssh/using-gnu-screen-to-manage-persistent-terminal-sessions) to manage server sessions.
+
+Optionally, I reccomend using [screen](https://www.linode.com/docs/networking/ssh/using-gnu-screen-to-manage-persistent-terminal-sessions) to manage server sessions.
 
 ## Adding bot to your Discord server
 
-Go back to the [Discord Dev Portal](https://discordapp.com/developers/applications/me) and open your app. This time copy the string under `Client ID`. Replace `<CLIENT ID>` with your Client ID in the link below:
+Go back to the [Discord Dev Portal](https://discordapp.com/developers/applications/me) and open your app. This time copy the string under `Client ID`. Replace `<CLIENT_ID>` with your app's Client ID in the link below:
 
 ```
-https://discordapp.com/oauth2/authorize?&client_id=<CLIENT ID>&scope=bot&permissions=0
+https://discordapp.com/oauth2/authorize?&client_id=<CLIENT_ID>&scope=bot&permissions=0
 ```
 
 Visit the link in your web browser and follow the instructions to add your bot to your Discord server.
