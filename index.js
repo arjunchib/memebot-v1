@@ -5,7 +5,8 @@ var ffmpeg = require('fluent-ffmpeg')
 var push = require('pushover-notifications')
 var ArgumentParser = require('argparse').ArgumentParser
 var express = require('express')
-
+var bodyParser = require('body-parser')
+var path = require('path')
 require('dotenv').config()
 
 // ENVIRONMENT VARS
@@ -19,8 +20,9 @@ const client = new Discord.Client()
 const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize', 'volume']
 
 // GLOBALS
-var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
-var citizens = JSON.parse(fs.readFileSync('citizens.json', 'utf8'))
+var memes = readJSON('memes.json')
+var citizens = readJSON('citizens.json')
+var subscribers = readJSON('subscribers.json')
 var isPlaying = false
 var blockedFile = null
 var debugMode = false
@@ -62,7 +64,7 @@ if (PUSHOVER_USER && PUSHOVER_TOKEN) {
   })
 }
 
-// MAIN LOOP
+// DISCORD SERVER
 client.on('ready', () => {
   console.log('Memebot ready')
 })
@@ -119,25 +121,64 @@ client.on('message', message => {
   }
 })
 
-// EXPRESS
-// var app = express()
-//
-// app.get('/memes', function (req, res) {
-//   if (!authorized(req.get('Authorization'))) {
-//     res.status(403).json('Forbidden')
-//     return
-//   }
-//   res.json(memes)
-// })
-//
-// app.get('/meme/:id', function (req, res) {
-//   if (!authorized(req.get('Authorization'))) {
-//     res.status(403).json('Forbidden')
-//     return
-//   }
-// })
-// 
-// app.listen(3000)
+// EXPRESS SERVER
+if (lordMode) {
+  var app = express()
+
+  app.use(bodyParser.json())
+
+  app.get('/memes', function (req, res) {
+    if (!authorized(req.get('Authorization'))) {
+      res.status(403).send('Forbidden')
+      return
+    }
+    res.json(memes)
+  })
+
+  app.get('/meme/:name', function (req, res) {
+    if (!authorized(req.get('Authorization'))) {
+      res.status(403).send('Forbidden')
+      return
+    }
+    var name = req.params.name
+    var index = findIndexByCommand(name)
+    if (index >= 0) {
+      var meme = memes[index]
+      res.json(meme)
+    } else {
+      res.status(404).send('Cannot find meme with name: ' + name)
+    }
+  })
+
+  app.get('/meme/:name/audio', function (req, res) {
+    if (!authorized(req.get('Authorization'))) {
+      res.status(403).send('Forbidden')
+      return
+    }
+    var name = req.params.name
+    var index = findIndexByCommand(name)
+    if (index >= 0) {
+      var meme = memes[index]
+      res.sendFile(path.join(__dirname, '/audio/', meme['file']))
+    } else {
+      res.status(404).send('Cannot find meme with name: ' + name)
+    }
+  })
+
+  app.post('/subscribe', function (req, res) {
+    if (!authorized(req.get('Authorization'))) {
+      res.status(403).send('Forbidden')
+      return
+    }
+    var subscriber = {
+      name: req.body.name
+    }
+    subscribers.push(subscriber)
+    saveSubscribers()
+  })
+
+  app.listen(3000)
+}
 
 // ADD
 function add (message, words) {
@@ -726,6 +767,18 @@ function saveMemes () {
 function saveCitizens () {
   citizens.sort(compareCitizens)
   fs.writeFileSync('citizens.json', JSON.stringify(citizens, null, 2))
+}
+
+function saveSubscribers () {
+  fs.writeFileSync('subscribers.json', JSON.stringify(subscribers, null, 2))
+}
+
+function readJSON (file) {
+  if (fs.existsSync(file)) {
+    return JSON.parse(fs.readFileSync(file, 'utf8'))
+  } else {
+    return []
+  }
 }
 
 function authorized (hash) {
