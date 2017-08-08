@@ -29,6 +29,7 @@
     "discord.js": "^11.1.0",
     "dotenv": "^4.0.0",
     "erlpack": "github:hammerandchisel/erlpack",
+    "express": "^4.15.4",
     "fluent-ffmpeg": "^2.1.0",
     "libsodium-wrappers": "^0.5.1",
     "node-opus": "^0.2.6",

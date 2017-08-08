@@ -4,25 +4,29 @@ var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
 var push = require('pushover-notifications')
 var ArgumentParser = require('argparse').ArgumentParser
+var express = require('express')
 
 require('dotenv').config()
 
+// ENVIRONMENT VARS
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN
 const PUSHOVER_USER = process.env.PUSHOVER_USER
 const PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN
 const ADMIN_USER_ID = process.env.ADMIN_USER_ID
 
+// CONSTANTS
 const client = new Discord.Client()
 const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize', 'volume']
 
+// GLOBALS
 var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
 var citizens = JSON.parse(fs.readFileSync('citizens.json', 'utf8'))
 var isPlaying = false
 var blockedFile = null
 var debugMode = false
 var lordMode = false
-var pushover
 
+// ARGUMENT PARSER
 var parser = new ArgumentParser({
   version: '0.1',
   addHelp: true,
@@ -47,6 +51,7 @@ debugMode = args.debug
 lordMode = args.lord
 
 // PUSH NOTIFICATIONS
+var pushover
 if (PUSHOVER_USER && PUSHOVER_TOKEN) {
   pushover = new push({ // eslint-disable-line
     user: PUSHOVER_USER,
@@ -114,6 +119,26 @@ client.on('message', message => {
   }
 })
 
+// EXPRESS
+// var app = express()
+//
+// app.get('/memes', function (req, res) {
+//   if (!authorized(req.get('Authorization'))) {
+//     res.status(403).json('Forbidden')
+//     return
+//   }
+//   res.json(memes)
+// })
+//
+// app.get('/meme/:id', function (req, res) {
+//   if (!authorized(req.get('Authorization'))) {
+//     res.status(403).json('Forbidden')
+//     return
+//   }
+// })
+// 
+// app.listen(3000)
+
 // ADD
 function add (message, words) {
   if (words.length < 5) {
@@ -127,7 +152,7 @@ function add (message, words) {
 
   let commands = []
   for (let i = 4; i < words.length; i++) {
-    commands.push(words[i].replace(',', ''))
+    commands.push(words[i].replace(/[^a-z0-9]/gi, ''))
   }
 
   for (let i = 0; i < commands.length; i++) {
@@ -701,6 +726,10 @@ function saveMemes () {
 function saveCitizens () {
   citizens.sort(compareCitizens)
   fs.writeFileSync('citizens.json', JSON.stringify(citizens, null, 2))
+}
+
+function authorized (hash) {
+  return true
 }
 
 // DEBUG
