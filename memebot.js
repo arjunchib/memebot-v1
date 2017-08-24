@@ -4,9 +4,6 @@ var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
 var push = require('pushover-notifications')
 var ArgumentParser = require('argparse').ArgumentParser
-var express = require('express')
-var bodyParser = require('body-parser')
-var path = require('path')
 require('dotenv').config()
 
 // ENVIRONMENT VARS
@@ -44,7 +41,7 @@ parser.addArgument(
 parser.addArgument(
   [ '-l', '--lord' ],
   {
-    help: 'Allows the server to send memes to leeches',
+    help: 'Enables lord mode where subscribers get new memes when added',
     action: 'storeTrue'
   }
 )
@@ -103,6 +100,7 @@ client.on('message', message => {
       play(message, words)
     }
   } catch (err) {
+    debug('Memebot crashed')
     console.log(err)
     if (pushover) {
       let msg = {
@@ -121,64 +119,12 @@ client.on('message', message => {
   }
 })
 
+client.on('disconnect', (event) => {
+  console.log('Memebot disconnect')
+})
+
 // EXPRESS SERVER
-if (lordMode) {
-  var app = express()
 
-  app.use(bodyParser.json())
-
-  app.get('/memes', function (req, res) {
-    if (!authorized(req.get('Authorization'))) {
-      res.status(403).send('Forbidden')
-      return
-    }
-    res.json(memes)
-  })
-
-  app.get('/meme/:name', function (req, res) {
-    if (!authorized(req.get('Authorization'))) {
-      res.status(403).send('Forbidden')
-      return
-    }
-    var name = req.params.name
-    var index = findIndexByCommand(name)
-    if (index >= 0) {
-      var meme = memes[index]
-      res.json(meme)
-    } else {
-      res.status(404).send('Cannot find meme with name: ' + name)
-    }
-  })
-
-  app.get('/meme/:name/audio', function (req, res) {
-    if (!authorized(req.get('Authorization'))) {
-      res.status(403).send('Forbidden')
-      return
-    }
-    var name = req.params.name
-    var index = findIndexByCommand(name)
-    if (index >= 0) {
-      var meme = memes[index]
-      res.sendFile(path.join(__dirname, '/audio/', meme['file']))
-    } else {
-      res.status(404).send('Cannot find meme with name: ' + name)
-    }
-  })
-
-  app.post('/subscribe', function (req, res) {
-    if (!authorized(req.get('Authorization'))) {
-      res.status(403).send('Forbidden')
-      return
-    }
-    var subscriber = {
-      name: req.body.name
-    }
-    subscribers.push(subscriber)
-    saveSubscribers()
-  })
-
-  app.listen(3000)
-}
 
 // ADD
 function add (message, words) {
@@ -373,7 +319,7 @@ function list (message, words) {
     for (let i = 0; i < citizens.length; i++) {
       for (let vote in citizens[i]['votes']) {
         let index = findIndexByCommand(vote)
-        if (memes[index]['archived']) {
+        if (index >= 0 && memes[index]['archived']) {
           vote += '*'
         }
         list.push(vote)
@@ -649,6 +595,12 @@ function playMeme (meme, voiceChannel, isRandom) {
         })
       })
       .catch(function (e) {
+        if (isRandom) {
+          debug('Failed to randomly play ' + file)
+        } else {
+          debug('Failed to play ' + file)
+        }
+        voiceChannel.leave()
         console.log(e)
       })
   }
@@ -708,11 +660,20 @@ function makeFileName (fileName, number) {
 
 function deleteMemeByIndex (index) {
   let file = memes[index]['file']
+  for (let i = 0; i < citizens.length; i++) {
+    for (let j = 0; j < citizens[i]['votes'].length; j++) {
+      if (citizens[i]['votes'][j] === memes[index]['name']) {
+        delete citizens[i]['votes'][j]
+      }
+    }
+  }
+  saveCitizens()
   memes.splice(index, 1)
   saveMemes()
   try {
     fs.unlinkSync('audio/' + file)
   } catch (err) {
+    debug('Failed to delete ' + file)
     console.log(err)
   }
   debug('Deleted ' + file)
