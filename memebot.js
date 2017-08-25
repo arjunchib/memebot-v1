@@ -4,6 +4,9 @@ var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
 var push = require('pushover-notifications')
 var ArgumentParser = require('argparse').ArgumentParser
+var express = require('express')
+var bodyParser = require('body-parser')
+var path = require('path')
 require('dotenv').config()
 
 // ENVIRONMENT VARS
@@ -14,12 +17,11 @@ const ADMIN_USER_ID = process.env.ADMIN_USER_ID
 
 // CONSTANTS
 const client = new Discord.Client()
-const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize', 'volume']
+const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize', 'volume', 'mb']
 
 // GLOBALS
 var memes = readJSON('memes.json')
 var citizens = readJSON('citizens.json')
-var subscribers = readJSON('subscribers.json')
 var isPlaying = false
 var blockedFile = null
 var debugMode = false
@@ -41,7 +43,7 @@ parser.addArgument(
 parser.addArgument(
   [ '-l', '--lord' ],
   {
-    help: 'Enables lord mode where subscribers get new memes when added',
+    help: 'Enables lord mode that creates a RESTful API to serve memes.',
     action: 'storeTrue'
   }
 )
@@ -59,6 +61,14 @@ if (PUSHOVER_USER && PUSHOVER_TOKEN) {
       console.log(error)
     }
   })
+}
+
+// CREATE DIRS
+if (!fs.existsSync('audio')) {
+  fs.mkdirSync('audio')
+}
+if (!fs.existsSync('logs')) {
+  fs.mkdirSync('logs')
 }
 
 // DISCORD SERVER
@@ -94,7 +104,7 @@ client.on('message', message => {
       vote(message, words)
     } else if (command === 'alias') {
       alias(message, words)
-    } else if (command === 'airhorn') {
+    } else if (command === 'airhorn' || command === 'mb') {
       return
     } else {
       play(message, words)
@@ -123,8 +133,57 @@ client.on('disconnect', (event) => {
   console.log('Memebot disconnect')
 })
 
-// EXPRESS SERVER
+client.login(DISCORD_TOKEN)
 
+// EXPRESS SERVER
+function cleanMeme (meme) {
+  return {
+    'commands': meme['commands'],
+    'file': meme['file'],
+    'name': meme['name'],
+    'audioModifier': meme['audioModifier'],
+    'dateAdded': meme['dateAdded'],
+    'lastModified': meme['lastModified'],
+    'archived': meme['archived']
+  }
+}
+
+if (lordMode) {
+  var app = express()
+
+  app.use(bodyParser.json())
+
+  app.get('/memes', function (req, res) {
+    var cleanedMemes = []
+    for (var i = 0; i < memes.length; i++) {
+      cleanedMemes.push(cleanMeme(memes[i]))
+    }
+    res.json(cleanedMemes)
+  })
+
+  app.get('/meme/:name', function (req, res) {
+    var name = req.params.name
+    var index = findIndexByCommand(name)
+    if (index >= 0) {
+      var cleanedMeme = cleanMeme(memes[index])
+      res.json(cleanedMeme)
+    } else {
+      res.status(404).send('Cannot find meme with name: ' + name)
+    }
+  })
+
+  app.get('/meme/:name/audio', function (req, res) {
+    var name = req.params.name
+    var index = findIndexByCommand(name)
+    if (index >= 0) {
+      res.sendFile(path.join(__dirname, '/audio/', memes[index]['file']))
+    } else {
+      res.status(404).send('Cannot find meme with name: ' + name)
+    }
+  })
+
+  app.listen(3000)
+}
 
 // ADD
 function add (message, words) {
@@ -193,6 +252,7 @@ function add (message, words) {
     file: filePath.substring(6),
     dateAdded: d.toJSON(),
     lastPlayed: d.toJSON(),
+    lastModified: d.toJSON(),
     audioModifier: 1,
     playCount: 0,
     archived: false
@@ -254,6 +314,7 @@ function alias (message, words) {
     } else if (numAliases > 1) {
       message.channel.send('Added commands to ' + memes[index]['name'] + ': ' + aliasString)
     }
+    updateLastModified(memes[index])
     saveMemes()
   } else if (words[1].toLowerCase() === 'remove') {
     for (i = 3; i < words.length; i++) {
@@ -272,6 +333,7 @@ function alias (message, words) {
     } else if (numAliases > 1) {
       message.channel.send('Removed commands from' + memes[index]['name'] + ': ' + aliasString)
     }
+    updateLastModified(memes[index])
     saveMemes()
   } else {
     displayErrorText(message)
@@ -387,7 +449,7 @@ function info (message, words) {
 
 // RANDOM
 function random (message, words) {
-  if (message.member.voiceChannel == null) {
+  if (message.member == null || message.member.voiceChannel == null) {
     message.channel.send('You must join a voice channel to play the dank memes')
     return
   }
@@ -424,6 +486,7 @@ function volume (message, words) {
     return
   }
   memes[index]['audioModifier'] = audioModifier
+  updateLastModified(memes[index])
   saveMemes()
   message.channel.send('The audio modifier of ' + memeInput + ' has been set to: ' + audioModifier)
   debug('Audio modifier of ' + memes[index]['name'] + ' set to ' + audioModifier)
@@ -525,6 +588,7 @@ function vote (message, words) {
   } else if (yeas > citizens.length / 2) {
     resolution += '\nThe ayes have it! The resolution is passed.'
     memes[index]['archived'] = !memeArchived
+    updateLastModified(memes[index])
     saveMemes()
     let result = memeArchived ? 'unarchived' : 'archived'
     let resultUpper = memeArchived ? 'Unarchived' : 'Archived'
@@ -544,7 +608,7 @@ function vote (message, words) {
 
 // PLAY
 function play (message, words) {
-  if (message.member.voiceChannel == null) {
+  if (message.member == null || message.member.voiceChannel == null) {
     message.channel.send('You must join a voice channel to play the dank memes')
     return
   }
@@ -686,6 +750,11 @@ function clearVotes (memeName) {
   saveCitizens()
 }
 
+function updateLastModified (meme) {
+  var d = new Date()
+  meme['lastModified'] = d.toJSON()
+}
+
 function compareMemes (a, b) {
   return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
 }
@@ -723,15 +792,12 @@ function hasAccess (meme, author) {
 function saveMemes () {
   memes.sort(compareMemes)
   fs.writeFileSync('memes.json', JSON.stringify(memes, null, 2))
+  fs.writeFileSync('memes-backup.json', JSON.stringify(memes, null, 2))
 }
 
 function saveCitizens () {
   citizens.sort(compareCitizens)
   fs.writeFileSync('citizens.json', JSON.stringify(citizens, null, 2))
-}
-
-function saveSubscribers () {
-  fs.writeFileSync('subscribers.json', JSON.stringify(subscribers, null, 2))
 }
 
 function readJSON (file) {
@@ -740,10 +806,6 @@ function readJSON (file) {
   } else {
     return []
   }
-}
-
-function authorized (hash) {
-  return true
 }
 
 // DEBUG
@@ -767,5 +829,3 @@ function formatTime (time) {
   }
   return time
 }
-
-client.login(DISCORD_TOKEN)
