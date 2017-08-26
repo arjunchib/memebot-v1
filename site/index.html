@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Memebot</title>
+  <link rel="stylesheet" type="text/css" href="memebot.css" />
+  <link rel="stylesheet" type="text/css" href="animations.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.css">
+</head>
+<body>
+  <h1 class="title">Memebot</h1>
+  <img  class="slideDown" id="glasses" src="glasses.png" />
+  <a id="discord" href="https://discordapp.com/oauth2/authorize?&client_id= 350733228098715658&scope=bot&permissions=0">
+    Add to Discord
+  </a>
+  <a class="circle" id="github" href="https://github.com/arjunchib/memebot">
+  </a>
+  <a class="circle" id="help" data-fancybox data-src="#help-section" href="javascript:;">
+  </a>
+
+  <div style="display: none;" id="help-section">
+    <p>
+      !mb [meme]<br />
+      Plays an audio meme on your currently connected voice channel.
+    </p>
+    <p>
+      !mb list<br />
+      A list of memes from newest to oldest.
+    </p>
+    <p>
+      !mb random<br />
+      Plays a random meme.
+    </p>
+    <p>
+      !mb help<br />
+      This message.
+    </p>
+  </div>
+
+  <!-- JS -->
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.js"></script>
+  <script type="text/javascript">
+    $.fancybox.defaults.autoFocus = false;
+  </script>
+</body>
+</html>

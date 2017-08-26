@@ -665,7 +665,7 @@ function playMeme (meme, voiceChannel, isRandom) {
           debug('Failed to play ' + file)
         }
         voiceChannel.leave()
-        console.log(e)
+        console.log(e.message)
       })
   }
 }

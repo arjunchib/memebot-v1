@@ -151,22 +151,7 @@ function list (message, words) {
   let names = '```'
   let list = []
 
-  if (words.length > 1) {
-    if (words[1] === 'least') {
-      memes.sort(compareMemesLeastPlayed)
-    } else if (words[1] === 'most') {
-      memes.sort(compareMemesMostPlayed)
-    } else if (words[1] === 'newest') {
-      memes.sort(compareMemesNewest)
-    } else if (words[1] === 'oldest') {
-      memes.sort(compareMemesOldest)
-    } else {
-      displayErrorText(message)
-      return
-    }
-  } else {
-    memes.sort(compareMemesMostPlayed)
-  }
+  memes.sort(compareMemesNewest)
 
   for (let i = 0; i < memes.length; i++) {
     if (!memes[i]['archived']) {
@@ -197,7 +182,7 @@ function list (message, words) {
 // HELP
 function help (message) {
   const helpText =
-  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/newest/oldest]\nA list of memes. If no modifier is given, the list defaults to unarchived memes ordered by the most times played.\n\n!random\nPlays a random meme.\n\n!help \nThis message.```'
+  '```!mb [meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!mb list\nA list of memes from newest to oldest.\n\n!mb random\nPlays a random meme.\n\n!mb help \nThis message.```'
   message.channel.send(helpText)
 }
 
@@ -316,14 +301,6 @@ function deleteMemeByIndex (index) {
 
 function compareMemes (a, b) {
   return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
-}
-
-function compareMemesMostPlayed (a, b) {
-  return b['playCount'] - a['playCount']
-}
-
-function compareMemesLeastPlayed (a, b) {
-  return a['playCount'] - b['playCount']
 }
 
 function compareMemesNewest (a, b) {
