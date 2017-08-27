@@ -307,9 +307,9 @@ function compareMemesNewest (a, b) {
   return new Date(b['dateAdded']) - new Date(a['dateAdded'])
 }
 
-function compareMemesOldest (a, b) {
-  return new Date(a['dateAdded']) - new Date(b['dateAdded'])
-}
+// function compareMemesOldest (a, b) {
+//   return new Date(a['dateAdded']) - new Date(b['dateAdded'])
+// }
 
 function saveMemes () {
   memes.sort(compareMemes)
