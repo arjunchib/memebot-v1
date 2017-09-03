@@ -7,6 +7,7 @@ var ArgumentParser = require('argparse').ArgumentParser
 var express = require('express')
 var bodyParser = require('body-parser')
 var path = require('path')
+var stringSimilarity = require('string-similarity')
 require('dotenv').config()
 
 // ENVIRONMENT VARS
@@ -271,13 +272,13 @@ function remove (message, words) {
   }
   let index = findIndexByCommand(words[1])
   if (index === -1) {
-    message.channel.send('Could not find meme by name: ' + words[1])
+    message.channel.send('Could not find meme by name: `' + words[1] + '`')
     displayErrorText(message)
     return
   }
   if (hasAccess(memes[index], message.author)) {
     deleteMemeByIndex(index)
-    message.channel.send('Deleted ' + words[1])
+    message.channel.send('Deleted `' + words[1] + '`')
   } else {
     message.channel.send('Only the author may delete memes. Vote for a deletion with the !vote command.')
   }
@@ -291,7 +292,7 @@ function alias (message, words) {
   }
   let index = findIndexByCommand(words[2])
   if (index === -1) {
-    message.channel.send('Could not find meme by name: ' + words[2])
+    message.channel.send('Could not find meme by name: `' + words[2] + '`')
     displayErrorText(message)
     return
   }
@@ -310,9 +311,9 @@ function alias (message, words) {
     if (numAliases === 0) {
       message.channel.send('No valid commands supplied for ' + memes[index]['name'])
     } else if (numAliases === 1) {
-      message.channel.send('Added command to ' + memes[index]['name'] + ': ' + aliasString)
+      message.channel.send('Added command to ' + memes[index]['name'] + ': `' + aliasString + '`')
     } else if (numAliases > 1) {
-      message.channel.send('Added commands to ' + memes[index]['name'] + ': ' + aliasString)
+      message.channel.send('Added commands to ' + memes[index]['name'] + ': `' + aliasString + '`')
     }
     updateLastModified(memes[index])
     saveMemes()
@@ -329,9 +330,9 @@ function alias (message, words) {
     if (numAliases === 0) {
       message.channel.send('No valid commands supplied for ' + memes[index]['name'])
     } else if (numAliases === 1) {
-      message.channel.send('Removed command from ' + memes[index]['name'] + ': ' + aliasString)
+      message.channel.send('Removed command from ' + memes[index]['name'] + ': `' + aliasString + '`')
     } else if (numAliases > 1) {
-      message.channel.send('Removed commands from' + memes[index]['name'] + ': ' + aliasString)
+      message.channel.send('Removed commands from' + memes[index]['name'] + ': `' + aliasString + '`')
     }
     updateLastModified(memes[index])
     saveMemes()
@@ -426,7 +427,7 @@ function info (message, words) {
   }
   let index = findIndexByCommand(memeInput)
   if (index === -1) {
-    message.channel.send('Could not find meme by name: ' + words[1])
+    message.channel.send('Could not find meme by name: `' + words[1] + '`')
     return
   }
   let meme = memes[index]
@@ -482,13 +483,13 @@ function volume (message, words) {
   }
   let index = findIndexByCommand(memeInput)
   if (index === -1) {
-    message.channel.send('Could not find meme by name: ' + words[1])
+    message.channel.send('Could not find meme by name: `' + words[1] + '`')
     return
   }
   memes[index]['audioModifier'] = audioModifier
   updateLastModified(memes[index])
   saveMemes()
-  message.channel.send('The audio modifier of ' + memeInput + ' has been set to: ' + audioModifier)
+  message.channel.send('The audio modifier of ' + memeInput + ' has been set to: `' + audioModifier + '`')
   debug('Audio modifier of ' + memes[index]['name'] + ' set to ' + audioModifier)
 }
 
@@ -518,7 +519,7 @@ function vote (message, words) {
 
   let index = findIndexByCommand(words[1])
   if (index === -1) {
-    message.channel.send('Could not find meme by name: ' + words[1])
+    message.channel.send('Could not find meme by name: `' + words[1] + '`')
     displayErrorText(message)
     return
   }
@@ -622,11 +623,16 @@ function play (message, words) {
   }
   let index = findIndexByCommand(memeInput)
   if (index === -1) {
-    message.channel.send('Could not find meme by name: ' + words[0])
+    var commands = []
+    for (let i = 0; i < memes.length; i++) {
+      commands = commands.concat(memes[i]['commands'])
+    }
+    var matches = stringSimilarity.findBestMatch(memeInput, commands)
+    message.channel.send('Could not find meme by name: `' + words[0] + '`\nDid you mean: `' + matches['bestMatch']['target'] + '`?')
     return
   }
   if (memes[index]['archived']) {
-    message.channel.send('Cannot play archived meme: ' + words[0])
+    message.channel.send('Cannot play archived meme: `' + words[0] + '`')
     return
   }
   let meme = memes[index]

@@ -2,6 +2,7 @@ var Discord = require('discord.js')
 var request = require('request')
 var schedule = require('node-schedule')
 var fs = require('fs')
+var stringSimilarity = require('string-similarity')
 var ArgumentParser = require('argparse').ArgumentParser
 require('dotenv').config()
 
@@ -57,6 +58,10 @@ client.on('message', message => {
     let words = message.content.substring(1).split(' ')
     if (words[0] === 'mb') {
       words.splice(0, 1)
+      if (words.length <= 0) {
+        help(message)
+        return
+      }
     } else {
       return
     }
@@ -74,8 +79,12 @@ client.on('message', message => {
     }
   } catch (err) {
     debug('Memebot crashed')
-    console.log(err)
+    console.error(err)
   }
+})
+
+client.on('guildCreate', guild => {
+  debug('Added to new guild')
 })
 
 client.on('disconnect', (event) => {
@@ -91,7 +100,7 @@ function syncMemes () {
     function (err, res, body) {
       if (err) {
         debug('Failed to sync memes')
-        console.log(err)
+        console.error(err)
         return
       }
       if (res && (res.statusCode === 200 || res.statusCode === 201)) {
@@ -130,7 +139,9 @@ function syncMemes () {
             memesDownloaded += 1
           }
         }
-        debug('Downloaded ' + memesDownloaded + ' memes')
+        if (memesDownloaded > 0) {
+          debug('Downloaded ' + memesDownloaded + ' memes')
+        }
         debug('Synced memes')
         saveMemes()
       }
@@ -141,42 +152,39 @@ function downloadMeme (meme) {
   request
     .get('http://teamloser.xyz:3000/meme/' + meme['name'] + '/audio')
     .on('error', function (err) {
-      console.log(err)
+      console.error(err)
     })
     .pipe(fs.createWriteStream('audio-leech/' + meme['file']))
 }
 
 // LIST
 function list (message, words) {
-  let names = '```'
-  let list = []
+  var names = ['```']
+  var listIndex = 0
+  var wordCount = 3
 
-  memes.sort(compareMemesNewest)
+  memes.sort(compareMemes)
 
   for (let i = 0; i < memes.length; i++) {
     if (!memes[i]['archived']) {
-      list.push(memes[i]['name'])
+      wordCount += memes[i]['name'].length
+      if (wordCount > 1997) {
+        names[listIndex] = names[listIndex].substring(0, names[listIndex].length - 2) + '```'
+        listIndex += 1
+        names[listIndex] = '```'
+        wordCount = 3 + memes[i]['name'].length
+      }
+      names[listIndex] += memes[i]['name']
+      names[listIndex] += ', '
+      wordCount += 2
     }
   }
 
-  for (let i = 0; i < list.length; i++) {
-    let memeName = list[i]
-    if (names.length + memeName.length + 2 <= 1999) {
-      names += memeName
-      names += ', '
-    }
-  }
+  names[listIndex] = names[listIndex].substring(0, names[listIndex].length - 2) + '```'
 
-  if (names.length > 1999) {
-    names = names.substring(0, 1999)
+  for (let i = 0; i < names.length; i++) {
+    message.channel.send(names[i])
   }
-  if (names.length > 3) {
-    names = names.substring(0, names.length - 2) + '```'
-  } else {
-    names = '```No memes :\'(```'
-  }
-
-  message.channel.send(names)
 }
 
 // HELP
@@ -219,7 +227,12 @@ function play (message, words) {
   }
   let index = findIndexByCommand(memeInput)
   if (index === -1 || memes[index]['archived']) {
-    message.channel.send('Could not find meme by name: ' + words[0])
+    var commands = []
+    for (let i = 0; i < memes.length; i++) {
+      commands = commands.concat(memes[i]['commands'])
+    }
+    var matches = stringSimilarity.findBestMatch(memeInput, commands)
+    message.channel.send('Could not find meme by name: `' + words[0] + '`\nDid you mean: `' + matches['bestMatch']['target'] + '`?')
     return
   }
   let meme = memes[index]
@@ -254,7 +267,7 @@ function playMeme (meme, voiceChannel, isRandom) {
           debug('Failed to play ' + file)
         }
         voiceChannel.leave()
-        console.log(e)
+        console.error(e)
       })
   }
 }
@@ -303,9 +316,9 @@ function compareMemes (a, b) {
   return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
 }
 
-function compareMemesNewest (a, b) {
-  return new Date(b['dateAdded']) - new Date(a['dateAdded'])
-}
+// function compareMemesNewest (a, b) {
+//   return new Date(b['dateAdded']) - new Date(a['dateAdded'])
+// }
 
 // function compareMemesOldest (a, b) {
 //   return new Date(a['dateAdded']) - new Date(b['dateAdded'])
