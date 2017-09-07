@@ -1,11 +1,11 @@
 var fs = require('fs')
 
 var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
-var d = new Date()
+// var d = new Date()
 
 for (let i = 0; i < memes.length; i++) {
   // Code to modify memes.json
-  memes[i]['lastModified'] = d.toJSON()
+  memes[i]['globalPlayCount'] = 0
 }
 saveMemes()
 

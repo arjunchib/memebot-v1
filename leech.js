@@ -11,6 +11,7 @@ const DISCORD_LEECH_TOKEN = process.env.DISCORD_LEECH_TOKEN
 
 // CONSTANTS
 const client = new Discord.Client()
+const baseURL = 'https://memebot.solutions:3000/api'
 
 // GLOBALS
 var memes = readJSON('memes-leech.json')
@@ -46,7 +47,7 @@ if (!fs.existsSync('logs')) {
 client.on('ready', () => {
   console.log('Memebot ready')
   syncMemes()
-  schedule.scheduleJob('0 * * * *', syncMemes)
+  schedule.scheduleJob('* * * * *', syncMemes)
 })
 
 client.on('message', message => {
@@ -95,8 +96,9 @@ client.login(DISCORD_LEECH_TOKEN)
 
 // SYNC MEMES
 function syncMemes () {
+  syncStats()
   request
-    .get({url: 'http://teamloser.xyz:3000/memes/', json: true},
+    .get({url: baseURL + '/memes/', json: true},
     function (err, res, body) {
       if (err) {
         debug('Failed to sync memes')
@@ -124,7 +126,6 @@ function syncMemes () {
             deleteMemeByIndex(i)
           }
         }
-
         for (i = 0; i < newMemes.length; i++) {
           found = false
           for (j = 0; j < memes.length; j++) {
@@ -142,7 +143,6 @@ function syncMemes () {
         if (memesDownloaded > 0) {
           debug('Downloaded ' + memesDownloaded + ' memes')
         }
-        debug('Synced memes')
         saveMemes()
       }
     })
@@ -150,11 +150,37 @@ function syncMemes () {
 
 function downloadMeme (meme) {
   request
-    .get('http://teamloser.xyz:3000/meme/' + meme['name'] + '/audio')
+    .get(baseURL + '/meme/' + meme['name'] + '/audio')
     .on('error', function (err) {
       console.error(err)
+      debug('Download failed for meme: ' + meme['name'])
     })
     .pipe(fs.createWriteStream('audio-leech/' + meme['file']))
+}
+
+function syncStats () {
+  var counts = []
+  for (let i = 0; i < memes.length; i++) {
+    if (memes[i]['playCount'] > 0) {
+      counts.push({
+        name: memes[i]['name'],
+        playCount: memes[i]['playCount']
+      })
+    }
+  }
+
+  var options = {
+    uri: baseURL + '/memes/playCount',
+    method: 'POST',
+    json: counts
+  }
+
+  request
+    .patch(options)
+    .on('error', function (err) {
+      console.error(err)
+      debug('Syncing stats failed')
+    })
 }
 
 // LIST

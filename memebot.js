@@ -8,6 +8,7 @@ var express = require('express')
 var bodyParser = require('body-parser')
 var path = require('path')
 var stringSimilarity = require('string-similarity')
+var https = require('https')
 require('dotenv').config()
 
 // ENVIRONMENT VARS
@@ -15,6 +16,9 @@ const DISCORD_TOKEN = process.env.DISCORD_TOKEN
 const PUSHOVER_USER = process.env.PUSHOVER_USER
 const PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN
 const ADMIN_USER_ID = process.env.ADMIN_USER_ID
+const PRIVATE_KEY_PATH = process.env.PRIVATE_KEY_PATH
+const CERTIFICATE_PATH = process.env.CERTIFICATE_PATH
+const CHAIN_PATH = process.env.CHAIN_PATH
 
 // CONSTANTS
 const client = new Discord.Client()
@@ -154,7 +158,7 @@ if (lordMode) {
 
   app.use(bodyParser.json())
 
-  app.get('/memes', function (req, res) {
+  app.get('/api/memes', function (req, res) {
     var cleanedMemes = []
     for (var i = 0; i < memes.length; i++) {
       cleanedMemes.push(cleanMeme(memes[i]))
@@ -162,7 +166,27 @@ if (lordMode) {
     res.json(cleanedMemes)
   })
 
-  app.get('/meme/:name', function (req, res) {
+  app.patch('/api/memes/playCount', function (req, res) {
+    var name = req.params.name
+    var counts = req.body
+    Object.keys(counts).forEach(function (name) {
+      var index = findIndexByCommand(name)
+      if (index >= 0) {
+        memes[index]['globalPlayCount'] += counts[name]
+      }
+    })
+    saveMemes()
+    var updatedCounts = []
+    for (let i = 0; i < memes.length; i++) {
+      updatedCounts[i] = {
+        name: name,
+        playCount: memes[i]['globalPlayCount']
+      }
+    }
+    res.sendJSON(updatedCounts)
+  })
+
+  app.get('/api/meme/:name', function (req, res) {
     var name = req.params.name
     var index = findIndexByCommand(name)
     if (index >= 0) {
@@ -173,7 +197,7 @@ if (lordMode) {
     }
   })
 
-  app.get('/meme/:name/audio', function (req, res) {
+  app.get('/api/meme/:name/audio', function (req, res) {
     var name = req.params.name
     var index = findIndexByCommand(name)
     if (index >= 0) {
@@ -183,7 +207,37 @@ if (lordMode) {
     }
   })
 
-  app.listen(3000)
+  app.get('/api/meme/:name/playCount', function (req, res) {
+    var name = req.params.name
+    var index = findIndexByCommand(name)
+    if (index >= 0) {
+      res.sendJSON({name: name, playCount: memes[index]['globalPlayCount']})
+    } else {
+      res.status(404).send('Cannot find meme with name: ' + name)
+    }
+  })
+
+  app.patch('/api/meme/:name/playCount', function (req, res) {
+    var name = req.params.name
+    var count = req.params.count
+    var index = findIndexByCommand(name)
+    if (index >= 0) {
+      memes[index]['globalPlayCount'] += count
+      saveMemes()
+      res.sendJSON({name: name, playCount: memes[index]['globalPlayCount']})
+    } else {
+      res.status(404).send('Cannot find meme with name: ' + name)
+    }
+  })
+
+  var credentials = {
+    key: fs.readFileSync(PRIVATE_KEY_PATH),
+    cert: fs.readFileSync(CERTIFICATE_PATH),
+    ca: fs.readFileSync(CHAIN_PATH)
+  }
+
+  var httpsServer = https.createServer(credentials, app)
+  httpsServer.listen(3000)
 }
 
 // ADD
@@ -354,15 +408,15 @@ function list (message, words) {
       memes.sort(compareMemesLeastPlayed)
     } else if (words[1] === 'most') {
       memes.sort(compareMemesMostPlayed)
-    } else if (words[1] === 'newest') {
+    } else if (words[1] === 'newest' || words[1] === 'new') {
       memes.sort(compareMemesNewest)
-    } else if (words[1] === 'oldest') {
+    } else if (words[1] === 'oldest' || words[1] === 'old') {
       memes.sort(compareMemesOldest)
     } else if (words[1] === 'all') {
       isAll = true
-    } else if (words[1] === 'archived' || words[1] === 'archives' || words[1] === 'archive') {
+    } else if (['archived', 'archives', 'archive'].includes(words[1])) {
       isArchived = true
-    } else if (words[1] === 'vote' || words[1] === 'voting' || words[1] === 'votes') {
+    } else if (['votes', 'voting', 'vote'].includes(words[1])) {
       isVoting = true
     } else {
       displayErrorText(message)
