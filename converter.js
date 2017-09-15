@@ -5,7 +5,7 @@ var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
 
 for (let i = 0; i < memes.length; i++) {
   // Code to modify memes.json
-  memes[i]['globalPlayCount'] = 0
+  delete memes[i]['globalPlayCount']
 }
 saveMemes()
 

@@ -27,6 +27,7 @@ const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airho
 // GLOBALS
 var memes = readJSON('memes.json')
 var citizens = readJSON('citizens.json')
+var stats = readJSON('stats.json')
 var isPlaying = false
 var blockedFile = null
 var debugMode = false
@@ -167,23 +168,22 @@ if (lordMode) {
   })
 
   app.patch('/api/memes/playCount', function (req, res) {
-    var name = req.params.name
     var counts = req.body
     Object.keys(counts).forEach(function (name) {
-      var index = findIndexByCommand(name)
-      if (index >= 0) {
-        memes[index]['globalPlayCount'] += counts[name]
+      if (findIndexByCommand(name) >= 0) {
+        if (stats['counts'][name]) {
+          stats['counts'][name] += counts[name]
+        } else {
+          stats['counts'][name] = counts[name]
+        }
       }
     })
-    saveMemes()
-    var updatedCounts = []
-    for (let i = 0; i < memes.length; i++) {
-      updatedCounts[i] = {
-        name: name,
-        playCount: memes[i]['globalPlayCount']
-      }
-    }
-    res.sendJSON(updatedCounts)
+    saveStats()
+    res.sendJSON(stats['counts'])
+  })
+
+  app.get('/api/memes/playCount', function (req, res) {
+    res.sendJSON(stats['counts'])
   })
 
   app.get('/api/meme/:name', function (req, res) {
@@ -209,9 +209,8 @@ if (lordMode) {
 
   app.get('/api/meme/:name/playCount', function (req, res) {
     var name = req.params.name
-    var index = findIndexByCommand(name)
-    if (index >= 0) {
-      res.sendJSON({name: name, playCount: memes[index]['globalPlayCount']})
+    if (findIndexByCommand(name) >= 0) {
+      res.sendJSON(stats['counts'][name] ? stats['counts'][name] : 0)
     } else {
       res.status(404).send('Cannot find meme with name: ' + name)
     }
@@ -220,11 +219,14 @@ if (lordMode) {
   app.patch('/api/meme/:name/playCount', function (req, res) {
     var name = req.params.name
     var count = req.params.count
-    var index = findIndexByCommand(name)
-    if (index >= 0) {
-      memes[index]['globalPlayCount'] += count
-      saveMemes()
-      res.sendJSON({name: name, playCount: memes[index]['globalPlayCount']})
+    if (findIndexByCommand(name) >= 0) {
+      if (stats['counts'][name]) {
+        stats['counts'][name] += count
+      } else {
+        stats['counts'][name] = count
+      }
+      saveStats()
+      res.sendJSON(stats['count'][name])
     } else {
       res.status(404).send('Cannot find meme with name: ' + name)
     }
@@ -314,6 +316,8 @@ function add (message, words) {
   }
   memes.push(meme)
   saveMemes()
+  stats[commands[0]] = 0
+  saveStats()
   message.channel.send('Added ' + commands[0])
   debug(message.author.username + ' added ' + filePath.substring(6))
 }
@@ -493,11 +497,13 @@ function info (message, words) {
   let dateLastPlayed = new Date(meme['lastPlayed'])
   let dateAdded = new Date(meme['dateAdded'])
   let status = meme['archived'] ? 'archived' : 'active'
+  let count = stats[meme['name']] ? stats[meme['name']] : 0
   output += '\nauthor: ' + meme['author']
   output += '\nlast played: ' + dateLastPlayed.toString()
   output += '\ndate added: ' + dateAdded.toDateString()
   output += '\naudio modifier: ' + meme['audioModifier']
   output += '\nplay count: ' + meme['playCount']
+  output += '\nglobal play count: ' + count
   output += '\nstatus: ' + status + '```'
   message.channel.send(output)
 }
@@ -792,6 +798,8 @@ function deleteMemeByIndex (index) {
     }
   }
   saveCitizens()
+  delete stats[memes[index]['name']]
+  saveStats()
   memes.splice(index, 1)
   saveMemes()
   try {
@@ -851,13 +859,29 @@ function hasAccess (meme, author) {
 
 function saveMemes () {
   memes.sort(compareMemes)
-  fs.writeFileSync('memes.json', JSON.stringify(memes, null, 2))
-  fs.writeFileSync('memes-backup.json', JSON.stringify(memes, null, 2))
+  fs.writeFile('memes.json', JSON.stringify(memes, null, 2), (err) => {
+    if (err) throw err
+    debug('Saved memes.json')
+  })
+  fs.writeFile('memes-backup.json', JSON.stringify(memes, null, 2), (err) => {
+    if (err) throw err
+    debug('Saved memes-backup.json')
+  })
 }
 
 function saveCitizens () {
   citizens.sort(compareCitizens)
-  fs.writeFileSync('citizens.json', JSON.stringify(citizens, null, 2))
+  fs.writeFile('citizens.json', JSON.stringify(citizens, null, 2), (err) => {
+    if (err) throw err
+    debug('Saved citizens.json')
+  })
+}
+
+function saveStats () {
+  fs.writeFile('stats.json', JSON.stringify(stats, null, 2), (err) => {
+    if (err) throw err
+    debug('Saved stats.json')
+  })
 }
 
 function readJSON (file) {

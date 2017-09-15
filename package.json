@@ -34,10 +34,12 @@
     "express": "^4.15.4",
     "fluent-ffmpeg": "^2.1.0",
     "libsodium-wrappers": "^0.5.2",
+    "lockfile": "^1.0.3",
     "node-opus": "^0.2.6",
     "node-schedule": "^1.2.4",
     "pushover-notifications": "^0.2.3",
     "request": "^2.81.0",
+    "signal-exit": "^3.0.2",
     "string-similarity": "^1.2.0",
     "ytdl-core": "^0.7.24"
   },
