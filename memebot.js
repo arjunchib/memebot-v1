@@ -9,6 +9,9 @@ var bodyParser = require('body-parser')
 var path = require('path')
 var stringSimilarity = require('string-similarity')
 var https = require('https')
+var schedule = require('node-schedule')
+var lockFile = require('lockfile')
+var onExit = require('signal-exit')
 require('dotenv').config()
 
 // ENVIRONMENT VARS
@@ -27,7 +30,7 @@ const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airho
 // GLOBALS
 var memes = readJSON('memes.json')
 var citizens = readJSON('citizens.json')
-var stats = readJSON('stats.json')
+var stats = {}
 var isPlaying = false
 var blockedFile = null
 var debugMode = false
@@ -77,9 +80,17 @@ if (!fs.existsSync('logs')) {
   fs.mkdirSync('logs')
 }
 
+// EXIT
+onExit(function (code, signal) {
+  updateStatsSync()
+  console.log('Killing memebot')
+})
+
 // DISCORD SERVER
 client.on('ready', () => {
   console.log('Memebot ready')
+  var cycle = debugMode ? '* * * * *' : '10 * * * *'
+  schedule.scheduleJob(cycle, updateStats)
 })
 
 client.on('message', message => {
@@ -141,6 +152,78 @@ client.on('disconnect', (event) => {
 
 client.login(DISCORD_TOKEN)
 
+// SYNC STATS
+function updateStats () {
+  var opts = { wait: 5000 }
+  lockFile.lock('stats.json.lock', opts, function (err) {
+    if (err) {
+      if (err.code === 'EEXIST') {
+        debug('stats.json is already locked', false)
+      } else {
+        console.error(err)
+      }
+      return
+    }
+    debug('locked', false)
+    var savedStats = readJSON('stats.json', {})
+    savedStats = mergeWithStats(savedStats)
+    saveStats(savedStats, function () {
+      lockFile.unlock('stats.json.lock', function (err) {
+        if (err) {
+          fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2), function (err) {
+            if (err) console.error(err)
+          })
+          console.error(err)
+        } else {
+          debug('unlocked', false)
+          stats = {}
+        }
+      })
+    })
+  })
+}
+
+function updateStatsSync () {
+  try {
+    lockFile.lockSync('stats.json.lock')
+    var savedStats = {}
+    if (fs.existsSync('stats.json')) {
+      savedStats = JSON.parse(fs.readFileSync('stats.json', 'utf8'))
+    }
+    savedStats = mergeWithStats(savedStats)
+    fs.writeFileSync('stats.json', JSON.stringify(savedStats, null, 2))
+    fs.writeFile('stats-backup.json', JSON.stringify(savedStats, null, 2))
+    lockFile.unlockSync('stats.json.lock')
+    stats = {}
+  } catch (e) {
+    debug(e.message)
+    fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2))
+  }
+}
+
+function mergeWithStats (savedStats) {
+  Object.keys(stats).forEach(function (statName) {
+    if (statName === 'guilds') {
+      if (savedStats.hasOwnProperty('guilds')) {
+        savedStats['guilds'] += stats['guilds']
+      } else {
+        savedStats['guilds'] = stats['guilds']
+      }
+    } else if (statName === 'counts') {
+      if (!savedStats['counts']) {
+        savedStats['counts'] = {}
+      }
+      Object.keys(stats['counts']).forEach(function (meme) {
+        if (!savedStats['counts'][meme]) {
+          savedStats['counts'][meme] = 0
+        }
+        savedStats['counts'][meme] += stats['counts'][meme]
+      })
+    }
+  })
+  return savedStats
+}
+
 // EXPRESS SERVER
 function cleanMeme (meme) {
   return {
@@ -178,7 +261,6 @@ if (lordMode) {
         }
       }
     })
-    saveStats()
     res.sendJSON(stats['counts'])
   })
 
@@ -225,7 +307,6 @@ if (lordMode) {
       } else {
         stats['counts'][name] = count
       }
-      saveStats()
       res.sendJSON(stats['count'][name])
     } else {
       res.status(404).send('Cannot find meme with name: ' + name)
@@ -315,10 +396,12 @@ function add (message, words) {
     archived: false
   }
   memes.push(meme)
-  saveMemes()
-  stats[commands[0]] = 0
-  saveStats()
+  if (stats['counts'] == null) {
+    stats['counts'] = {}
+  }
+  stats['counts'][meme.name] = 0
   message.channel.send('Added ' + commands[0])
+  saveMemes()
   debug(message.author.username + ' added ' + filePath.substring(6))
 }
 
@@ -497,7 +580,7 @@ function info (message, words) {
   let dateLastPlayed = new Date(meme['lastPlayed'])
   let dateAdded = new Date(meme['dateAdded'])
   let status = meme['archived'] ? 'archived' : 'active'
-  let count = stats[meme['name']] ? stats[meme['name']] : 0
+  let count = stats['counts'] && stats['counts'][meme['name']] ? stats['counts'][meme['name']] : 0
   output += '\nauthor: ' + meme['author']
   output += '\nlast played: ' + dateLastPlayed.toString()
   output += '\ndate added: ' + dateAdded.toDateString()
@@ -799,14 +882,13 @@ function deleteMemeByIndex (index) {
   }
   saveCitizens()
   delete stats[memes[index]['name']]
-  saveStats()
   memes.splice(index, 1)
   saveMemes()
   try {
     fs.unlinkSync('audio/' + file)
   } catch (err) {
     debug('Failed to delete ' + file)
-    console.log(err)
+    console.error(err.message)
   }
   debug('Deleted ' + file)
 }
@@ -861,11 +943,11 @@ function saveMemes () {
   memes.sort(compareMemes)
   fs.writeFile('memes.json', JSON.stringify(memes, null, 2), (err) => {
     if (err) throw err
-    debug('Saved memes.json')
+    debug('Saved memes.json', false)
   })
   fs.writeFile('memes-backup.json', JSON.stringify(memes, null, 2), (err) => {
     if (err) throw err
-    debug('Saved memes-backup.json')
+    debug('Saved memes-backup.json', false)
   })
 }
 
@@ -873,38 +955,46 @@ function saveCitizens () {
   citizens.sort(compareCitizens)
   fs.writeFile('citizens.json', JSON.stringify(citizens, null, 2), (err) => {
     if (err) throw err
-    debug('Saved citizens.json')
+    debug('Saved citizens.json', false)
   })
 }
 
-function saveStats () {
-  fs.writeFile('stats.json', JSON.stringify(stats, null, 2), (err) => {
+function saveStats (totalStats, callback) {
+  fs.writeFile('stats.json', JSON.stringify(totalStats, null, 2), (err) => {
     if (err) throw err
-    debug('Saved stats.json')
+    debug('Saved stats.json', false)
+    fs.writeFile('stats-backup.json', JSON.stringify(totalStats, null, 2), (err) => {
+      if (err) throw err
+      debug('Saved stats-backup.json', false)
+      callback()
+    })
   })
 }
 
-function readJSON (file) {
-  if (fs.existsSync(file)) {
+function readJSON (file, defaultValue = []) {
+  try {
     return JSON.parse(fs.readFileSync(file, 'utf8'))
-  } else {
-    return []
+  } catch (e) {
+    console.error(e.message)
+    return defaultValue
   }
 }
 
 // DEBUG
-function debug (msg) {
+function debug (msg, shouldLog = true) {
   if (debugMode) {
     console.log(msg)
   }
-  let d = new Date()
-  let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
-  msg = '[' + timeString + '] ' + msg + '\n'
-  fs.appendFile('logs/debug.log', msg, function (err) {
-    if (err) {
-      return console.log(err)
-    }
-  })
+  if (shouldLog) {
+    let d = new Date()
+    let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
+    msg = '[' + timeString + '] ' + msg + '\n'
+    fs.appendFile('logs/debug.log', msg, function (err) {
+      if (err) {
+        return console.log(err)
+      }
+    })
+  }
 }
 
 function formatTime (time) {

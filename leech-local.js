@@ -3,9 +3,9 @@ var schedule = require('node-schedule')
 var fs = require('fs')
 var stringSimilarity = require('string-similarity')
 var ArgumentParser = require('argparse').ArgumentParser
-require('dotenv').config()
 var lockFile = require('lockfile')
 var onExit = require('signal-exit')
+require('dotenv').config()
 
 // ENVIRONMENT VARS
 const DISCORD_LEECH_TOKEN = process.env.DISCORD_LEECH_TOKEN
@@ -42,14 +42,15 @@ if (!fs.existsSync('logs')) {
 
 // EXIT
 onExit(function (code, signal) {
-  syncSync()
+  updateStatsSync()
   console.log('Killing memebot')
 })
 
 // DISCORD SERVER
 client.on('ready', () => {
   console.log('Memebot ready')
-  schedule.scheduleJob('10 * * * *', sync)
+  var cycle = debugMode ? '* * * * *' : '10 * * * *'
+  schedule.scheduleJob(cycle, updateStats)
 })
 
 client.on('message', message => {
@@ -101,49 +102,57 @@ client.on('disconnect', (event) => {
 
 client.login(DISCORD_LEECH_TOKEN)
 
-// SYNC
-function sync () {
-  var opts = {
-    wait: 10000
-  }
+// SYNC STATS
+function updateStats () {
+  var opts = { wait: 5000 }
   lockFile.lock('stats.json.lock', opts, function (err) {
     if (err) {
-      console.error(err)
+      if (err.code === 'EEXIST') {
+        debug('stats.json is already locked', false)
+      } else {
+        console.error(err)
+      }
       return
     }
-    var savedStats = {}
-    if (fs.existsSync('stats.json')) {
-      savedStats = JSON.parse(fs.readFileSync('stats.json', 'utf8'))
-    }
-    savedStats = updateStats(savedStats)
-    saveStats(savedStats)
-    lockFile.unlock('stats.json.lock', function (err) {
-      if (err) {
-        fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2), function (err) {
-          if (err) console.error(err)
-        })
-        console.error(err)
-      } else {
-        stats = {}
-      }
+    debug('locked', false)
+    var savedStats = readJSON('stats.json', {})
+    savedStats = mergeWithStats(savedStats)
+    saveStats(savedStats, function () {
+      lockFile.unlock('stats.json.lock', function (err) {
+        if (err) {
+          fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2), function (err) { if (err) { console.error(err) } })
+          console.error(err)
+        } else {
+          debug('unlocked', false)
+          stats = {}
+        }
+      })
     })
   })
 }
 
-function syncSync () {
-  lockFile.lockSync('stats.json.lock')
-  var savedStats = {}
-  if (fs.existsSync('stats.json')) {
-    savedStats = JSON.parse(fs.readFileSync('stats.json', 'utf8'))
+function updateStatsSync () {
+  try {
+    lockFile.lockSync('stats.json.lock')
+    debug('locked', false)
+    var savedStats = {}
+    if (fs.existsSync('stats.json')) {
+      savedStats = JSON.parse(fs.readFileSync('stats.json', 'utf8'))
+    }
+    savedStats = mergeWithStats(savedStats)
+    fs.writeFileSync('stats.json', JSON.stringify(savedStats, null, 2))
+    fs.writeFile('stats-backup.json', JSON.stringify(savedStats, null, 2))
+    lockFile.unlockSync('stats.json.lock')
+    debug('unlocked', false)
+    stats = {}
+  } catch (e) {
+    debug(e.message)
+    fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2))
+    lockFile.unlockSync('stats.json.lock')
   }
-  savedStats = updateStats(savedStats)
-  fs.writeFileSync('stats.json', JSON.stringify(savedStats, null, 2))
-  fs.writeFile('stats-backup.json', JSON.stringify(savedStats, null, 2))
-  lockFile.unlockSync('stats.json.lock')
-  stats = {}
 }
 
-function updateStats (savedStats) {
+function mergeWithStats (savedStats) {
   Object.keys(stats).forEach(function (statName) {
     if (statName === 'guilds') {
       if (savedStats.hasOwnProperty('guilds')) {
@@ -329,37 +338,42 @@ function compareMemes (a, b) {
 //   return new Date(a['dateAdded']) - new Date(b['dateAdded'])
 // }
 
-function saveStats (totalStats) {
+function saveStats (totalStats, callback) {
   fs.writeFile('stats.json', JSON.stringify(totalStats, null, 2), (err) => {
     if (err) throw err
-    debug('Saved stats.json')
-  })
-  fs.writeFile('stats-backup.json', JSON.stringify(totalStats, null, 2), (err) => {
-    if (err) throw err
+    debug('Saved stats.json', false)
+    fs.writeFile('stats-backup.json', JSON.stringify(totalStats, null, 2), (err) => {
+      if (err) throw err
+      debug('Saved stats-backup.json', false)
+      callback()
+    })
   })
 }
 
-function readJSON (file) {
-  if (fs.existsSync(file)) {
+function readJSON (file, defaultValue = []) {
+  try {
     return JSON.parse(fs.readFileSync(file, 'utf8'))
-  } else {
-    return []
+  } catch (e) {
+    console.error(e.message)
+    return defaultValue
   }
 }
 
 // DEBUG
-function debug (msg) {
+function debug (msg, shouldLog = true) {
   if (debugMode) {
     console.log(msg)
   }
-  let d = new Date()
-  let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
-  msg = '[' + timeString + '] ' + msg + '\n'
-  fs.appendFile('logs/debug-leech.log', msg, function (err) {
-    if (err) {
-      return console.log(err)
-    }
-  })
+  if (shouldLog) {
+    let d = new Date()
+    let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
+    msg = '[' + timeString + '] ' + msg + '\n'
+    fs.appendFile('logs/debug-leech.log', msg, function (err) {
+      if (err) {
+        return console.log(err)
+      }
+    })
+  }
 }
 
 function formatTime (time) {
