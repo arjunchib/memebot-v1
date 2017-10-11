@@ -23,7 +23,7 @@ debugMode = args.debug
 
 var shardArgs = debugMode ? ['-d'] : []
 
-const manager = new ShardingManager('leech-local.js', {token: DISCORD_LEECH_TOKEN, shardArgs: shardArgs})
+const manager = new ShardingManager('leech.js', {token: DISCORD_LEECH_TOKEN, shardArgs: shardArgs})
 
 manager.spawn()
 manager.on('launch', function (shard) {

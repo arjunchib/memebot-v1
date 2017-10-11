@@ -1,9 +1,10 @@
 var Discord = require('discord.js')
-var request = require('request')
 var schedule = require('node-schedule')
 var fs = require('fs')
 var stringSimilarity = require('string-similarity')
 var ArgumentParser = require('argparse').ArgumentParser
+var lockFile = require('lockfile')
+var onExit = require('signal-exit')
 require('dotenv').config()
 
 // ENVIRONMENT VARS
@@ -11,12 +12,11 @@ const DISCORD_LEECH_TOKEN = process.env.DISCORD_LEECH_TOKEN
 
 // CONSTANTS
 const client = new Discord.Client()
-const baseURL = 'https://memebot.solutions:3000/api'
 
 // GLOBALS
-var memes = readJSON('memes-leech.json')
-var isPlaying = false
-var blockedFile = null
+var memes = readJSON('memes.json')
+var stats = {}
+var isPlaying = {}
 var debugMode = false
 
 // ARGUMENT PARSER
@@ -36,18 +36,21 @@ var args = parser.parseArgs()
 debugMode = args.debug
 
 // CREATE DIRS
-if (!fs.existsSync('audio-leech')) {
-  fs.mkdirSync('audio-leech')
-}
 if (!fs.existsSync('logs')) {
   fs.mkdirSync('logs')
 }
 
+// EXIT
+onExit(function (code, signal) {
+  updateStatsSync()
+  console.log('Killing memebot')
+})
+
 // DISCORD SERVER
 client.on('ready', () => {
   console.log('Memebot ready')
-  syncMemes()
-  schedule.scheduleJob('* * * * *', syncMemes)
+  var cycle = debugMode ? '* * * * *' : '10 * * * *'
+  schedule.scheduleJob(cycle, updateStats)
 })
 
 client.on('message', message => {
@@ -85,6 +88,11 @@ client.on('message', message => {
 })
 
 client.on('guildCreate', guild => {
+  if (stats['guilds']) {
+    stats['guilds'] += 1
+  } else {
+    stats['guilds'] = 1
+  }
   debug('Added to new guild')
 })
 
@@ -94,98 +102,77 @@ client.on('disconnect', (event) => {
 
 client.login(DISCORD_LEECH_TOKEN)
 
-// SYNC MEMES
-function syncMemes () {
-  syncStats()
-  request
-    .get({url: baseURL + '/memes/', json: true},
-    function (err, res, body) {
-      if (err) {
-        debug('Failed to sync memes')
+// SYNC STATS
+function updateStats () {
+  var opts = { wait: 5000 }
+  lockFile.lock('stats.json.lock', opts, function (err) {
+    if (err) {
+      if (err.code === 'EEXIST') {
+        debug('stats.json is already locked', false)
+      } else {
         console.error(err)
-        return
       }
-      if (res && (res.statusCode === 200 || res.statusCode === 201)) {
-        var newMemes = body
-        var memesDownloaded = 0
-        for (var i = 0; i < memes.length; i++) {
-          var found = false
-          for (var j = 0; j < newMemes.length; j++) {
-            if (memes[i]['name'] === newMemes[j]['name']) {
-              found = true
-              if (memes[i]['file'] !== newMemes[j]['file'] ||
-                  memes[i]['dateAdded'] !== newMemes[j]['dateAdded']) {
-                downloadMeme(memes[i])
-                memesDownloaded += 1
-              }
-              memes[i] = newMemes[j]
-              break
-            }
-          }
-          if (!found) {
-            deleteMemeByIndex(i)
-          }
-        }
-        for (i = 0; i < newMemes.length; i++) {
-          found = false
-          for (j = 0; j < memes.length; j++) {
-            if (newMemes[i]['name'] === memes[j]['name']) {
-              found = true
-              break
-            }
-          }
-          if (!found) {
-            memes.push(newMemes[i])
-            downloadMeme(newMemes[i])
-            memesDownloaded += 1
-          }
-        }
-        if (memesDownloaded > 0) {
-          debug('Downloaded ' + memesDownloaded + ' memes')
-        }
-        saveMemes()
-      }
-    })
-}
-
-function downloadMeme (meme) {
-  request
-    .get(baseURL + '/meme/' + meme['name'] + '/audio')
-    .on('error', function (err) {
-      console.error(err)
-      debug('Download failed for meme: ' + meme['name'])
-    })
-    .pipe(fs.createWriteStream('audio-leech/' + meme['file']))
-}
-
-function syncStats () {
-  var counts = {}
-  for (let i = 0; i < memes.length; i++) {
-    if (memes[i]['playCount'] > 0) {
-      counts[memes[i]['name']] = memes[i]['playCount']
+      return
     }
-  }
-
-  var options = {
-    uri: baseURL + '/memes/playCount',
-    method: 'POST',
-    json: counts
-  }
-
-  request.patch(options)
-    .on('response', function (response) {
-      if (response.statusCode === 200) {
-        for (let i = 0; i < memes.length; i++) {
-          if (counts[memes[i]['name']]) {
-            memes[i]['playCount'] -= counts[memes[i]['name']]
-          }
+    debug('locked', false)
+    var savedStats = readJSON('stats.json', {})
+    savedStats = mergeWithStats(savedStats)
+    saveStats(savedStats, function () {
+      lockFile.unlock('stats.json.lock', function (err) {
+        if (err) {
+          fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2), function (err) { if (err) { console.error(err) } })
+          console.error(err)
+        } else {
+          debug('unlocked', false)
+          stats = {}
         }
+      })
+    })
+  })
+}
+
+function updateStatsSync () {
+  try {
+    lockFile.lockSync('stats.json.lock')
+    debug('locked', false)
+    var savedStats = {}
+    if (fs.existsSync('stats.json')) {
+      savedStats = JSON.parse(fs.readFileSync('stats.json', 'utf8'))
+    }
+    savedStats = mergeWithStats(savedStats)
+    fs.writeFileSync('stats.json', JSON.stringify(savedStats, null, 2))
+    fs.writeFile('stats-backup.json', JSON.stringify(savedStats, null, 2))
+    lockFile.unlockSync('stats.json.lock')
+    debug('unlocked', false)
+    stats = {}
+  } catch (e) {
+    debug(e.message)
+    fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2))
+    lockFile.unlockSync('stats.json.lock')
+  }
+}
+
+function mergeWithStats (savedStats) {
+  Object.keys(stats).forEach(function (statName) {
+    if (statName === 'guilds') {
+      if (savedStats.hasOwnProperty('guilds')) {
+        savedStats['guilds'] += stats['guilds']
+      } else {
+        savedStats['guilds'] = stats['guilds']
       }
-    })
-    .on('error', function (err) {
-      console.error(err)
-      debug('Syncing stats failed')
-    })
+    } else if (statName === 'counts') {
+      if (!savedStats['counts']) {
+        savedStats['counts'] = {}
+      }
+      Object.keys(stats['counts']).forEach(function (meme) {
+        if (!savedStats['counts'][meme]) {
+          savedStats['counts'][meme] = 0
+        }
+        savedStats['counts'][meme] += stats['counts'][meme]
+      })
+    }
+  })
+  return savedStats
 }
 
 // LIST
@@ -268,13 +255,22 @@ function play (message, words) {
   }
   let meme = memes[index]
   playMeme(meme, message.member.voiceChannel, false)
+  if (!stats['counts']) {
+    stats['counts'] = {}
+  }
+  if (stats['counts'][meme['name']]) {
+    stats['counts'][meme['name']] += 1
+  } else {
+    stats['counts'][meme['name']] = 1
+  }
 }
 
 function playMeme (meme, voiceChannel, isRandom) {
   let file = meme['file']
   let audioMod = meme['audioModifier']
-  if (!isPlaying && file !== blockedFile) {
-    isPlaying = true
+  if (!isPlaying.hasOwnProperty(voiceChannel.id) ||
+      !isPlaying[voiceChannel.id]) {
+    isPlaying[voiceChannel.id] = true
     voiceChannel.join()
       .then(connection => {
         if (isRandom) {
@@ -282,13 +278,13 @@ function playMeme (meme, voiceChannel, isRandom) {
         } else {
           debug('Playing ' + file)
         }
-        const dispatcher = connection.playFile('audio-leech/' + file, {
+        const dispatcher = connection.playFile('audio/' + file, {
           volume: 0.50 * audioMod
         })
         dispatcher.on('end', () => {
           debug('Stopped playing ' + file)
           voiceChannel.leave()
-          isPlaying = false
+          isPlaying[voiceChannel.id] = false
         })
       })
       .catch(function (e) {
@@ -330,19 +326,6 @@ function findIndexByCommand (inputCommand) {
   return -1
 }
 
-function deleteMemeByIndex (index) {
-  let file = memes[index]['file']
-  memes.splice(index, 1)
-  saveMemes()
-  try {
-    fs.unlinkSync('audio-leech/' + file)
-  } catch (err) {
-    debug('Failed to delete ' + file)
-    console.log(err)
-  }
-  debug('Deleted ' + file)
-}
-
 function compareMemes (a, b) {
   return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
 }
@@ -355,32 +338,42 @@ function compareMemes (a, b) {
 //   return new Date(a['dateAdded']) - new Date(b['dateAdded'])
 // }
 
-function saveMemes () {
-  memes.sort(compareMemes)
-  fs.writeFileSync('memes-leech.json', JSON.stringify(memes, null, 2))
+function saveStats (totalStats, callback) {
+  fs.writeFile('stats.json', JSON.stringify(totalStats, null, 2), (err) => {
+    if (err) throw err
+    debug('Saved stats.json', false)
+    fs.writeFile('stats-backup.json', JSON.stringify(totalStats, null, 2), (err) => {
+      if (err) throw err
+      debug('Saved stats-backup.json', false)
+      callback()
+    })
+  })
 }
 
-function readJSON (file) {
-  if (fs.existsSync(file)) {
+function readJSON (file, defaultValue = []) {
+  try {
     return JSON.parse(fs.readFileSync(file, 'utf8'))
-  } else {
-    return []
+  } catch (e) {
+    console.error(e.message)
+    return defaultValue
   }
 }
 
 // DEBUG
-function debug (msg) {
+function debug (msg, shouldLog = true) {
   if (debugMode) {
     console.log(msg)
   }
-  let d = new Date()
-  let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
-  msg = '[' + timeString + '] ' + msg + '\n'
-  fs.appendFile('logs/debug-leech.log', msg, function (err) {
-    if (err) {
-      return console.log(err)
-    }
-  })
+  if (shouldLog) {
+    let d = new Date()
+    let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
+    msg = '[' + timeString + '] ' + msg + '\n'
+    fs.appendFile('logs/debug-leech.log', msg, function (err) {
+      if (err) {
+        return console.log(err)
+      }
+    })
+  }
 }
 
 function formatTime (time) {

@@ -4,11 +4,7 @@ var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
 var push = require('pushover-notifications')
 var ArgumentParser = require('argparse').ArgumentParser
-var express = require('express')
-var bodyParser = require('body-parser')
-var path = require('path')
 var stringSimilarity = require('string-similarity')
-var https = require('https')
 var schedule = require('node-schedule')
 var lockFile = require('lockfile')
 var onExit = require('signal-exit')
@@ -19,9 +15,6 @@ const DISCORD_TOKEN = process.env.DISCORD_TOKEN
 const PUSHOVER_USER = process.env.PUSHOVER_USER
 const PUSHOVER_TOKEN = process.env.PUSHOVER_TOKEN
 const ADMIN_USER_ID = process.env.ADMIN_USER_ID
-const PRIVATE_KEY_PATH = process.env.PRIVATE_KEY_PATH
-const CERTIFICATE_PATH = process.env.CERTIFICATE_PATH
-const CHAIN_PATH = process.env.CHAIN_PATH
 
 // CONSTANTS
 const client = new Discord.Client()
@@ -34,7 +27,6 @@ var stats = {}
 var isPlaying = false
 var blockedFile = null
 var debugMode = false
-var lordMode = false
 
 // ARGUMENT PARSER
 var parser = new ArgumentParser({
@@ -49,16 +41,8 @@ parser.addArgument(
     action: 'storeTrue'
   }
 )
-parser.addArgument(
-  [ '-l', '--lord' ],
-  {
-    help: 'Enables lord mode that creates a RESTful API to serve memes.',
-    action: 'storeTrue'
-  }
-)
 var args = parser.parseArgs()
 debugMode = args.debug
-lordMode = args.lord
 
 // PUSH NOTIFICATIONS
 var pushover
@@ -222,105 +206,6 @@ function mergeWithStats (savedStats) {
     }
   })
   return savedStats
-}
-
-// EXPRESS SERVER
-function cleanMeme (meme) {
-  return {
-    'commands': meme['commands'],
-    'file': meme['file'],
-    'name': meme['name'],
-    'audioModifier': meme['audioModifier'],
-    'dateAdded': meme['dateAdded'],
-    'lastModified': meme['lastModified'],
-    'archived': meme['archived']
-  }
-}
-
-if (lordMode) {
-  var app = express()
-
-  app.use(bodyParser.json())
-
-  app.get('/api/memes', function (req, res) {
-    var cleanedMemes = []
-    for (var i = 0; i < memes.length; i++) {
-      cleanedMemes.push(cleanMeme(memes[i]))
-    }
-    res.json(cleanedMemes)
-  })
-
-  app.patch('/api/memes/playCount', function (req, res) {
-    var counts = req.body
-    Object.keys(counts).forEach(function (name) {
-      if (findIndexByCommand(name) >= 0) {
-        if (stats['counts'][name]) {
-          stats['counts'][name] += counts[name]
-        } else {
-          stats['counts'][name] = counts[name]
-        }
-      }
-    })
-    res.sendJSON(stats['counts'])
-  })
-
-  app.get('/api/memes/playCount', function (req, res) {
-    res.sendJSON(stats['counts'])
-  })
-
-  app.get('/api/meme/:name', function (req, res) {
-    var name = req.params.name
-    var index = findIndexByCommand(name)
-    if (index >= 0) {
-      var cleanedMeme = cleanMeme(memes[index])
-      res.json(cleanedMeme)
-    } else {
-      res.status(404).send('Cannot find meme with name: ' + name)
-    }
-  })
-
-  app.get('/api/meme/:name/audio', function (req, res) {
-    var name = req.params.name
-    var index = findIndexByCommand(name)
-    if (index >= 0) {
-      res.sendFile(path.join(__dirname, '/audio/', memes[index]['file']))
-    } else {
-      res.status(404).send('Cannot find meme with name: ' + name)
-    }
-  })
-
-  app.get('/api/meme/:name/playCount', function (req, res) {
-    var name = req.params.name
-    if (findIndexByCommand(name) >= 0) {
-      res.sendJSON(stats['counts'][name] ? stats['counts'][name] : 0)
-    } else {
-      res.status(404).send('Cannot find meme with name: ' + name)
-    }
-  })
-
-  app.patch('/api/meme/:name/playCount', function (req, res) {
-    var name = req.params.name
-    var count = req.params.count
-    if (findIndexByCommand(name) >= 0) {
-      if (stats['counts'][name]) {
-        stats['counts'][name] += count
-      } else {
-        stats['counts'][name] = count
-      }
-      res.sendJSON(stats['count'][name])
-    } else {
-      res.status(404).send('Cannot find meme with name: ' + name)
-    }
-  })
-
-  var credentials = {
-    key: fs.readFileSync(PRIVATE_KEY_PATH),
-    cert: fs.readFileSync(CERTIFICATE_PATH),
-    ca: fs.readFileSync(CHAIN_PATH)
-  }
-
-  var httpsServer = https.createServer(credentials, app)
-  httpsServer.listen(3000)
 }
 
 // ADD
