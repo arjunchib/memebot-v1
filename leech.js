@@ -104,6 +104,7 @@ client.login(DISCORD_LEECH_TOKEN)
 
 // SYNC STATS
 function updateStats () {
+  memes = readJSON('memes.json')
   var opts = { wait: 5000 }
   lockFile.lock('stats.json.lock', opts, function (err) {
     if (err) {
@@ -184,7 +185,7 @@ function list (message, words) {
   memes.sort(compareMemes)
 
   for (let i = 0; i < memes.length; i++) {
-    if (!memes[i]['archived']) {
+    if (!memes[i]['archived'] && !memes[i]['tags'].includes('suicidal')) {
       wordCount += memes[i]['name'].length
       if (wordCount > 1997) {
         names[listIndex] = names[listIndex].substring(0, names[listIndex].length - 2) + '```'
@@ -222,7 +223,9 @@ function random (message, words) {
   if (memes[randomIndex]['archived']) {
     random(message, words)
   } else {
-    if (!isPlaying) {
+    let voiceChannel = message.member.voiceChannel
+    if (!isPlaying.hasOwnProperty(voiceChannel.id) ||
+        !isPlaying[voiceChannel.id]) {
       message.channel.send('Playing ' + memes[randomIndex]['name'])
     }
     playMeme(memes[randomIndex], message.member.voiceChannel, true)
@@ -244,7 +247,7 @@ function play (message, words) {
     return
   }
   let index = findIndexByCommand(memeInput)
-  if (index === -1 || memes[index]['archived']) {
+  if (index === -1 || memes[index]['archived'] || memes[index]['tags'].includes('suicidal')) {
     var commands = []
     for (let i = 0; i < memes.length; i++) {
       commands = commands.concat(memes[i]['commands'])

@@ -5,8 +5,6 @@ var ffmpeg = require('fluent-ffmpeg')
 var push = require('pushover-notifications')
 var ArgumentParser = require('argparse').ArgumentParser
 var stringSimilarity = require('string-similarity')
-var schedule = require('node-schedule')
-var lockFile = require('lockfile')
 var onExit = require('signal-exit')
 require('dotenv').config()
 
@@ -18,12 +16,12 @@ const ADMIN_USER_ID = process.env.ADMIN_USER_ID
 
 // CONSTANTS
 const client = new Discord.Client()
-const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize', 'volume', 'mb']
+const reservedWords = ['add', 'delete', 'list', 'help', 'random', 'info', 'airhorn', 'vote', 'naturalize', 'volume', 'mb', 'stats', 'tag', 'untag', 'tags', 'alias', 'unalias', '!', '!!']
 
 // GLOBALS
 var memes = readJSON('memes.json')
 var citizens = readJSON('citizens.json')
-var stats = {}
+var stats = readJSON('stats.json', {})
 var isPlaying = false
 var blockedFile = null
 var debugMode = false
@@ -66,15 +64,12 @@ if (!fs.existsSync('logs')) {
 
 // EXIT
 onExit(function (code, signal) {
-  updateStatsSync()
   console.log('Killing memebot')
 })
 
 // DISCORD SERVER
 client.on('ready', () => {
   console.log('Memebot ready')
-  var cycle = debugMode ? '* * * * *' : '10 * * * *'
-  schedule.scheduleJob(cycle, updateStats)
 })
 
 client.on('message', message => {
@@ -103,8 +98,12 @@ client.on('message', message => {
       volume(message, words)
     } else if (command === 'vote') {
       vote(message, words)
-    } else if (command === 'alias') {
+    } else if (command === 'alias' || command === 'unalias') {
       alias(message, words)
+    } else if (command === 'stats') {
+      showStats(message)
+    } else if (command === 'tag' || command === 'untag') {
+      tag(message, words)
     } else if (command === 'airhorn' || command === 'mb') {
       return
     } else {
@@ -134,79 +133,11 @@ client.on('disconnect', (event) => {
   console.log('Memebot disconnect')
 })
 
+client.on('error', (error) => {
+  console.error(error)
+})
+
 client.login(DISCORD_TOKEN)
-
-// SYNC STATS
-function updateStats () {
-  var opts = { wait: 5000 }
-  lockFile.lock('stats.json.lock', opts, function (err) {
-    if (err) {
-      if (err.code === 'EEXIST') {
-        debug('stats.json is already locked', false)
-      } else {
-        console.error(err)
-      }
-      return
-    }
-    debug('locked', false)
-    var savedStats = readJSON('stats.json', {})
-    savedStats = mergeWithStats(savedStats)
-    saveStats(savedStats, function () {
-      lockFile.unlock('stats.json.lock', function (err) {
-        if (err) {
-          fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2), function (err) {
-            if (err) console.error(err)
-          })
-          console.error(err)
-        } else {
-          debug('unlocked', false)
-          stats = {}
-        }
-      })
-    })
-  })
-}
-
-function updateStatsSync () {
-  try {
-    lockFile.lockSync('stats.json.lock')
-    var savedStats = {}
-    if (fs.existsSync('stats.json')) {
-      savedStats = JSON.parse(fs.readFileSync('stats.json', 'utf8'))
-    }
-    savedStats = mergeWithStats(savedStats)
-    fs.writeFileSync('stats.json', JSON.stringify(savedStats, null, 2))
-    fs.writeFile('stats-backup.json', JSON.stringify(savedStats, null, 2))
-    lockFile.unlockSync('stats.json.lock')
-    stats = {}
-  } catch (e) {
-    debug(e.message)
-    fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2))
-  }
-}
-
-function mergeWithStats (savedStats) {
-  Object.keys(stats).forEach(function (statName) {
-    if (statName === 'guilds') {
-      if (savedStats.hasOwnProperty('guilds')) {
-        savedStats['guilds'] += stats['guilds']
-      } else {
-        savedStats['guilds'] = stats['guilds']
-      }
-    } else if (statName === 'counts') {
-      if (!savedStats['counts']) {
-        savedStats['counts'] = {}
-      }
-      Object.keys(stats['counts']).forEach(function (meme) {
-        if (!savedStats['counts'][meme]) {
-          savedStats['counts'][meme] = 0
-        }
-        savedStats['counts'][meme] += stats['counts'][meme]
-      })
-    }
-  })
-  return savedStats
-}
 
 // ADD
 function add (message, words) {
@@ -214,10 +145,6 @@ function add (message, words) {
     displayErrorText(message)
     return
   }
-
-  let stream = ytdl(words[1])
-  let startTime = words[2]
-  let endTime = words[3]
 
   let commands = []
   for (let i = 4; i < words.length; i++) {
@@ -245,49 +172,53 @@ function add (message, words) {
     }
   }
 
-  let endSeekOption = '-to ' + endTime
-  let filePath = makeFilePath('audio/', commands[0], '.mp3')
+  try {
+    let stream = ytdl(words[1])
+    let startTime = words[2]
+    let endTime = words[3]
 
-  blockedFile = commands[0] + '.mp3'
-  ffmpeg(stream)
-  .noVideo()
-  .seekOutput(startTime)
-  .format('mp3')
-  .outputOptions(['-write_xing 0', endSeekOption])
-  .save(filePath)
-  .on('end', function (err, stdout, stderr) {
-    if (err) {
-      console.log('Cannot process video: ' + err.message)
+    let endSeekOption = '-to ' + endTime
+    let filePath = makeFilePath('audio/', commands[0], '.mp3')
+
+    blockedFile = commands[0] + '.mp3'
+    ffmpeg(stream)
+    .noVideo()
+    .seekOutput(startTime)
+    .format('mp3')
+    .outputOptions(['-write_xing 0', endSeekOption])
+    .on('end', function (stdout, stderr) {
+      blockedFile = null
+    })
+    .on('error', function (err, stdout, stderr) {
+      console.error('Cannot process video: ' + err.message)
+      debug(message.author.username + ' induced an ffmpeg error')
+      displayErrorText(message)
+    })
+    .save(filePath)
+
+    let d = new Date()
+    let meme = {
+      name: commands[0],
+      author: message.author.username,
+      authorID: message.author.id,
+      commands: commands,
+      tags: [],
+      file: filePath.substring(6),
+      dateAdded: d.toJSON(),
+      lastPlayed: d.toJSON(),
+      lastModified: d.toJSON(),
+      audioModifier: 1,
+      playCount: 0,
+      archived: false
     }
-    blockedFile = null
-  })
-  .on('error', function (err, stdout, stderr) {
-    console.log('Cannot process video: ' + err.message)
-    debug(message.author.username + ' induced an ffmpeg error')
-  })
-
-  let d = new Date()
-  let meme = {
-    name: commands[0],
-    author: message.author.username,
-    authorID: message.author.id,
-    commands: commands,
-    file: filePath.substring(6),
-    dateAdded: d.toJSON(),
-    lastPlayed: d.toJSON(),
-    lastModified: d.toJSON(),
-    audioModifier: 1,
-    playCount: 0,
-    archived: false
+    memes.push(meme)
+    message.channel.send('Added ' + commands[0])
+    saveMemes()
+    debug(message.author.username + ' added ' + filePath.substring(6))
+  } catch (e) {
+    message.channel.send('Unable to add meme please check your link and commands')
+    debug('An error occured when ' + message.author.username + ' tried to add ' + words[1])
   }
-  memes.push(meme)
-  if (stats['counts'] == null) {
-    stats['counts'] = {}
-  }
-  stats['counts'][meme.name] = 0
-  message.channel.send('Added ' + commands[0])
-  saveMemes()
-  debug(message.author.username + ' added ' + filePath.substring(6))
 }
 
 // REMOVE
@@ -312,59 +243,114 @@ function remove (message, words) {
 
 // ALIAS
 function alias (message, words) {
-  if (words.length < 4) {
+  if (words.length < 3) {
     displayErrorText(message)
     return
   }
-  let index = findIndexByCommand(words[2])
+  let index = findIndexByCommand(words[1])
   if (index === -1) {
-    message.channel.send('Could not find meme by name: `' + words[2] + '`')
+    message.channel.send('Could not find meme by name: `' + words[1] + '`')
     displayErrorText(message)
     return
   }
-  var numAliases = 0
-  var aliasString = ''
-  var i = 0
-  if (words[1].toLowerCase() === 'add') {
-    for (i = 3; i < words.length; i++) {
+  let numAliases = 0
+  let output = ''
+  if (words[0].toLowerCase() === 'alias') {
+    for (let i = 2; i < words.length; i++) {
       if (!memes[index]['commands'].includes(words[i]) && findIndexByCommand(words[i]) < 0) {
         memes[index]['commands'].push(words[i])
-        aliasString += (words[i] + ', ')
+        output += (words[i] + ', ')
         numAliases += 1
       }
     }
-    aliasString = aliasString.substring(0, aliasString.length - 2)
+    output = output.substring(0, output.length - 2)
     if (numAliases === 0) {
-      message.channel.send('No valid commands supplied for ' + memes[index]['name'])
+      output = 'No valid commands supplied for ' + memes[index]['name']
     } else if (numAliases === 1) {
-      message.channel.send('Added command to ' + memes[index]['name'] + ': `' + aliasString + '`')
+      output = 'Added command to ' + memes[index]['name'] + ': `' + output + '`'
     } else if (numAliases > 1) {
-      message.channel.send('Added commands to ' + memes[index]['name'] + ': `' + aliasString + '`')
+      output = 'Added commands to ' + memes[index]['name'] + ': `' + output + '`'
     }
-    updateLastModified(memes[index])
-    saveMemes()
-  } else if (words[1].toLowerCase() === 'remove') {
-    for (i = 3; i < words.length; i++) {
+  } else if (words[0].toLowerCase() === 'unalias') {
+    for (let i = 2; i < words.length; i++) {
       if (memes[index]['commands'].includes(words[i]) && words[i].toLowerCase() !== memes[index]['name'].toLowerCase()) {
         var commandIndex = memes[index]['commands'].indexOf(words[i])
         memes[index]['commands'].splice(commandIndex, 1)
-        aliasString += (words[i] + ', ')
+        output += (words[i] + ', ')
         numAliases += 1
       }
     }
-    aliasString = aliasString.substring(0, aliasString.length - 2)
+    output = output.substring(0, output.length - 2)
     if (numAliases === 0) {
-      message.channel.send('No valid commands supplied for ' + memes[index]['name'])
+      output = 'No valid commands supplied for ' + memes[index]['name']
     } else if (numAliases === 1) {
-      message.channel.send('Removed command from ' + memes[index]['name'] + ': `' + aliasString + '`')
+      output = 'Removed command from ' + memes[index]['name'] + ': `' + output + '`'
     } else if (numAliases > 1) {
-      message.channel.send('Removed commands from' + memes[index]['name'] + ': `' + aliasString + '`')
+      output = 'Removed commands from' + memes[index]['name'] + ': `' + output + '`'
     }
-    updateLastModified(memes[index])
-    saveMemes()
   } else {
     displayErrorText(message)
+    return
   }
+  message.channel.send(output)
+  updateLastModified(memes[index])
+  saveMemes()
+}
+
+// TAG
+function tag (message, words) {
+  if (words.length < 3) {
+    displayErrorText(message)
+    return
+  }
+  let index = findIndexByCommand(words[1])
+  if (index === -1) {
+    message.channel.send('Could not find meme by name: `' + words[1] + '`')
+    displayErrorText(message)
+    return
+  }
+  let numTags = 0
+  let output = ''
+  if (words[0].toLowerCase() === 'tag') {
+    for (let i = 2; i < words.length; i++) {
+      if (!memes[index]['tags'].includes(words[i])) {
+        memes[index]['tags'].push(words[i])
+        output += (words[i] + ', ')
+        numTags += 1
+      }
+    }
+    output = output.substring(0, output.length - 2)
+    if (numTags === 0) {
+      output = 'No valid tags supplied for ' + memes[index]['name']
+    } else if (numTags === 1) {
+      output = 'Added tag to ' + memes[index]['name'] + ': `' + output + '`'
+    } else if (numTags > 1) {
+      output = 'Added tags to ' + memes[index]['name'] + ': `' + output + '`'
+    }
+  } else if (words[0].toLowerCase() === 'untag') {
+    for (let i = 2; i < words.length; i++) {
+      if (memes[index]['tags'].includes(words[i])) {
+        var tagIndex = memes[index]['tags'].indexOf(words[i])
+        memes[index]['tags'].splice(tagIndex, 1)
+        output += (words[i] + ', ')
+        numTags += 1
+      }
+    }
+    output = output.substring(0, output.length - 2)
+    if (numTags === 0) {
+      output = 'No valid commands supplied for ' + memes[index]['name']
+    } else if (numTags === 1) {
+      output = 'Removed tag from ' + memes[index]['name'] + ': `' + output + '`'
+    } else if (numTags > 1) {
+      output = 'Removed tags from' + memes[index]['name'] + ': `' + output + '`'
+    }
+  } else {
+    displayErrorText(message)
+    return
+  }
+  message.channel.send(output)
+  updateLastModified(memes[index])
+  saveMemes()
 }
 
 // LIST
@@ -374,6 +360,8 @@ function list (message, words) {
   let isAll = false
   let isArchived = false
   let isVoting = false
+  let isTag = false
+  let isTags = false
 
   if (words.length > 1) {
     if (words[1] === 'least') {
@@ -384,12 +372,22 @@ function list (message, words) {
       memes.sort(compareMemesNewest)
     } else if (words[1] === 'oldest' || words[1] === 'old') {
       memes.sort(compareMemesOldest)
+    } else if (words[1] === 'global') {
+      if (words[2] === 'least') {
+        memes.sort(compareMemesGlobalLeastPlayed)
+      } else {
+        memes.sort(compareMemesGlobalMostPlayed)
+      }
     } else if (words[1] === 'all') {
       isAll = true
     } else if (['archived', 'archives', 'archive'].includes(words[1])) {
       isArchived = true
     } else if (['votes', 'voting', 'vote'].includes(words[1])) {
       isVoting = true
+    } else if (words[1] === 'tags') {
+      isTags = true
+    } else if (words.length > 1) {
+      isTag = true
     } else {
       displayErrorText(message)
       return
@@ -398,13 +396,23 @@ function list (message, words) {
     memes.sort(compareMemesMostPlayed)
   }
 
-  if (!isVoting) {
+  if (isTag) {
     for (let i = 0; i < memes.length; i++) {
-      if (isAll || isArchived === memes[i]['archived']) {
-        list.push(memes[i]['name'])
+      for (let tagIndex = 1; tagIndex < words.length; tagIndex++) {
+        if (memes[i]['tags'].includes(words[tagIndex])) {
+          list.push(memes[i]['name'])
+        }
       }
     }
-  } else {
+  } else if (isTags) {
+    let tags = new Set()
+    for (let i = 0; i < memes.length; i++) {
+      for (let tag in memes[i]['tags']) {
+        tags.add(memes[i]['tags'][tag])
+      }
+    }
+    list = [...tags]
+  } else if (isVoting) {
     for (let i = 0; i < citizens.length; i++) {
       for (let vote in citizens[i]['votes']) {
         let index = findIndexByCommand(vote)
@@ -415,6 +423,12 @@ function list (message, words) {
       }
     }
     list = removeDuplicates(list)
+  } else {
+    for (let i = 0; i < memes.length; i++) {
+      if (isAll || isArchived === memes[i]['archived']) {
+        list.push(memes[i]['name'])
+      }
+    }
   }
 
   for (let i = 0; i < list.length; i++) {
@@ -440,7 +454,7 @@ function list (message, words) {
 // HELP
 function help (message) {
   const helpText =
-  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/newest/oldest/archives/votes/all]\nA list of memes. If no modifier is given, the list defaults to unarchived memes ordered by the most times played.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random\nPlays a random meme.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!volume [meme] [audio modifier]\nSets an audio modifier for the meme, such that 0.5 is half the normal volume and 2.0 is twice the normal volume.\n\n!alias [add/remove] [meme] [command 1, command 2, ...]\nAdds or removes commands for the meme. Cannot remove the first command given to the meme.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!help \nThis message.```'
+  '```![meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!list [most/least/newest/oldest/archives/votes/all/tags/<tag>]\nA list of memes. If no modifier is given, the list defaults to alphabetical order.\n\n!add [youtube link] [start time] [end time] [command 1, command 2, ...]\nAdds a meme from a youtube video, pulling audio from the start time to the end time. The name of the first command becomes the name of the meme. Start time and end time can take in seconds, hh:mm:ss format, and even decimals.\n\nEx. !add https://www.youtube.com/watch?v=6JaY3vtb760 2:31 2:45.5 Caveman shaggy scooby\n\n!delete [meme]\nDeletes the meme that with this name, if you were the person who added it.\n\n!random [tag]\nPlays a random meme. If the tag option is used, will play a random memes with that tag.\n\n!info [meme]\nDisplays stats and alternate commands for a meme.\n\n!volume [meme] [audio modifier]\nSets an audio modifier for the meme, such that 0.5 is half the normal volume and 2.0 is twice the normal volume.\n\n!(un)alias [meme] [command 1, command 2, ...]\nAdds or removes commands for the meme. Cannot remove the first command given to the meme.\n\n!(un)tag [meme] [tag 1, tag 2, ...]\nAdds or removes tags for the meme.\n\n!vote [meme] [keep/remove/abstain]\nAllows you to vote for a meme\'s archival. You must be a citizen to vote. The meme will be activated/deactivated once it has recieved over 50% approval.\n\n!stats\nDisplays memebot stats\n\n!help \nThis message.```'
   message.channel.send(helpText)
 }
 
@@ -456,12 +470,23 @@ function info (message, words) {
     message.channel.send('Could not find meme by name: `' + words[1] + '`')
     return
   }
+  readStats()
   let meme = memes[index]
-  let output = '```name: ' + meme['name'] + '\ncommands: '
+  let output = '```name: ' + meme['name']
+  output += '\ncommands: '
   for (let i = 0; i < meme['commands'].length; i++) {
     output += meme['commands'][i] + ', '
   }
   output = output.substring(0, output.length - 2)
+  output += '\ntags: '
+  if (meme['tags'].length > 0) {
+    for (let i = 0; i < meme['tags'].length; i++) {
+      output += meme['tags'][i] + ', '
+    }
+    output = output.substring(0, output.length - 2)
+  } else {
+    output += '<none>'
+  }
   let dateLastPlayed = new Date(meme['lastPlayed'])
   let dateAdded = new Date(meme['dateAdded'])
   let status = meme['archived'] ? 'archived' : 'active'
@@ -478,18 +503,37 @@ function info (message, words) {
 
 // RANDOM
 function random (message, words) {
-  if (message.member == null || message.member.voiceChannel == null) {
+  let voiceChannel = client.channels.find('id', '213484561127047169')
+  if (message.member != null && message.member.voiceChannel != null) {
+    voiceChannel = message.member.voiceChannel
+  }
+  if (voiceChannel == null || voiceChannel.type !== 'voice') {
     message.channel.send('You must join a voice channel to play the dank memes')
     return
   }
-  let randomIndex = Math.floor(Math.random() * memes.length)
-  if (memes[randomIndex]['archived']) {
-    random(message, words)
+  let randomIndex = -1
+  if (words.length === 1) {
+    do {
+      randomIndex = Math.floor(Math.random() * memes.length)
+    } while (memes[randomIndex]['archived'])
   } else {
-    if (!isPlaying) {
-      message.channel.send('Playing ' + memes[randomIndex]['name'])
+    let tags = []
+    for (let i = 0; i < memes.length; i++) {
+      if (!memes[i]['archived'] && memes[i]['tags'].includes(words[1])) {
+        tags.push(i)
+      }
     }
-    playMeme(memes[randomIndex], message.member.voiceChannel, true)
+    if (tags.length === 0) {
+      message.channel.send('Could not find any memes with tag: ' + words[1])
+      return
+    }
+    do {
+      randomIndex = tags[Math.floor(Math.random() * tags.length)]
+    } while (memes[randomIndex]['archived'])
+  }
+  if (!isPlaying) {
+    message.channel.send('Playing ' + memes[randomIndex]['name'])
+    playMeme(memes[randomIndex], voiceChannel, true)
   }
 }
 
@@ -635,36 +679,73 @@ function vote (message, words) {
   message.channel.send(resolution)
 }
 
+function showStats (message) {
+  let numGuilds = stats['guilds']
+  let numPlays = 0
+  Object.keys(stats['counts']).forEach(function (name) {
+    numPlays += stats['counts'][name]
+  })
+  let numMemes = memes.length
+  let statsText = '```Active guilds: ' + numGuilds
+  statsText += '\nNumber of memes played: ' + numPlays
+  statsText += '\nNumber of memes: ' + numMemes
+  statsText += '```'
+  message.channel.send(statsText)
+}
+
 // PLAY
 function play (message, words) {
-  if (message.member == null || message.member.voiceChannel == null) {
+  let voiceChannel = client.channels.find('id', '213484561127047169')
+  if (message.member != null && message.member.voiceChannel != null) {
+    voiceChannel = message.member.voiceChannel
+  }
+  if (voiceChannel == null || voiceChannel.type !== 'voice') {
     message.channel.send('You must join a voice channel to play the dank memes')
     return
   }
-  let memeInput = words[0]
-  if (words[0].length === 0 && words.length > 1) {
-    memeInput = words[1]
+  let memeInput = ''
+  for (let i = 0; i < words.length; i++) {
+    if (words[i].length !== 0) {
+      memeInput += words[i]
+    }
   }
-  if (memeInput == null) {
+  if (memeInput == null || memeInput.length === 0) {
     displayErrorText(message)
     return
   }
+  let force = false
+  if (memeInput[0] === '!') {
+    force = true
+    memeInput = memeInput.substring(1)
+  }
+  if (memeInput === 'random') {
+    random(message, words)
+  }
   let index = findIndexByCommand(memeInput)
-  if (index === -1) {
+  if (index === -1 || memes[index]['archived']) {
     var commands = []
     for (let i = 0; i < memes.length; i++) {
-      commands = commands.concat(memes[i]['commands'])
+      if (!memes[i]['archived']) {
+        commands = commands.concat(memes[i]['commands'])
+      }
     }
     var matches = stringSimilarity.findBestMatch(memeInput, commands)
-    message.channel.send('Could not find meme by name: `' + words[0] + '`\nDid you mean: `' + matches['bestMatch']['target'] + '`?')
-    return
-  }
-  if (memes[index]['archived']) {
-    message.channel.send('Cannot play archived meme: `' + words[0] + '`')
-    return
+    if (!force) {
+      let output = ''
+      if (index >= 0 && memes[index]['archived']) {
+        output += 'Cannot play archived meme: `' + memeInput + '`'
+      } else {
+        output += 'Could not find meme by name: `' + memeInput + '`'
+      }
+      output += '\nDid you mean: `' + matches['bestMatch']['target'] + '`?'
+      message.channel.send(output)
+      return
+    } else {
+      index = findIndexByCommand(matches['bestMatch']['target'])
+    }
   }
   let meme = memes[index]
-  playMeme(meme, message.member.voiceChannel, false)
+  playMeme(meme, voiceChannel, false)
   let d = new Date()
   memes[index]['lastPlayed'] = d.toJSON()
   memes[index]['playCount'] += 1
@@ -766,7 +847,6 @@ function deleteMemeByIndex (index) {
     }
   }
   saveCitizens()
-  delete stats[memes[index]['name']]
   memes.splice(index, 1)
   saveMemes()
   try {
@@ -800,6 +880,20 @@ function compareMemesMostPlayed (a, b) {
 
 function compareMemesLeastPlayed (a, b) {
   return a['playCount'] - b['playCount']
+}
+
+function compareMemesGlobalMostPlayed (a, b) {
+  readStats()
+  let countA = stats['counts'] && stats['counts'][a['name']] ? stats['counts'][a['name']] : 0
+  let countB = stats['counts'] && stats['counts'][b['name']] ? stats['counts'][b['name']] : 0
+  return countB - countA
+}
+
+function compareMemesGlobalLeastPlayed (a, b) {
+  readStats()
+  let countA = stats['counts'] && stats['counts'][a['name']] ? stats['counts'][a['name']] : 0
+  let countB = stats['counts'] && stats['counts'][b['name']] ? stats['counts'][b['name']] : 0
+  return countA - countB
 }
 
 function compareMemesNewest (a, b) {
@@ -844,18 +938,6 @@ function saveCitizens () {
   })
 }
 
-function saveStats (totalStats, callback) {
-  fs.writeFile('stats.json', JSON.stringify(totalStats, null, 2), (err) => {
-    if (err) throw err
-    debug('Saved stats.json', false)
-    fs.writeFile('stats-backup.json', JSON.stringify(totalStats, null, 2), (err) => {
-      if (err) throw err
-      debug('Saved stats-backup.json', false)
-      callback()
-    })
-  })
-}
-
 function readJSON (file, defaultValue = []) {
   try {
     return JSON.parse(fs.readFileSync(file, 'utf8'))
@@ -863,6 +945,10 @@ function readJSON (file, defaultValue = []) {
     console.error(e.message)
     return defaultValue
   }
+}
+
+function readStats () {
+  stats = readJSON('stats.json', {})
 }
 
 // DEBUG

@@ -41,7 +41,7 @@
     "request": "^2.81.0",
     "signal-exit": "^3.0.2",
     "string-similarity": "^1.2.0",
-    "ytdl-core": "^0.7.24"
+    "ytdl-core": "^0.20.1"
   },
   "engines": {
     "node": ">=8"
