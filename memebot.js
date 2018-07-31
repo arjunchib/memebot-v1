@@ -70,6 +70,12 @@ onExit(function (code, signal) {
 // DISCORD SERVER
 client.on('ready', () => {
   console.log('Memebot ready')
+  //SET Game Playing - status and streaming
+
+  client.setStatus('STATUS HERE') //Online - idle - invisible and dnd
+  client.setGame('GAME NAME HERE') // Enter the name of the game here
+  //cliente.setGame('GAME NAME GERE', 'LINK TO TWITCH') //To use streaming status use this line along with the top line
+  //the streaming status will only be shown if the twitch channel is live, only twitch links are compatible.
 })
 
 client.on('message', message => {
