@@ -1,56 +1,44 @@
 var Discord = require('discord.js')
-var schedule = require('node-schedule')
-var fs = require('fs')
-var stringSimilarity = require('string-similarity')
-var ArgumentParser = require('argparse').ArgumentParser
-var lockFile = require('lockfile')
 var onExit = require('signal-exit')
-require('dotenv').config()
 
-// ENVIRONMENT VARS
+// Environment variables
+require('dotenv').config()
 const DISCORD_LEECH_TOKEN = process.env.DISCORD_LEECH_TOKEN
 
-// CONSTANTS
+// Controllers
+const list = require('./controllers/list.js')
+const random = require('./controllers/random.js')
+const play = require('./controllers/play.js')
+
+// Helpers
+const logger = require('./helpers/logger.js')
+const util = require('./helpers/util.js')
+
+// Variables
 const client = new Discord.Client()
 
-// GLOBALS
-var memes = readJSON('memes.json')
-var stats = {}
-var isPlaying = {}
-var debugMode = false
+// Configure logger
+logger.config('leech-' + client.shard.id)
 
-// ARGUMENT PARSER
-var parser = new ArgumentParser({
-  version: '0.1',
-  addHelp: true,
-  description: 'A Discord bot that only plays memes'
-})
-parser.addArgument(
-  [ '-d', '--debug' ],
-  {
-    help: 'Enables logging to the console',
-    action: 'storeTrue'
-  }
-)
-var args = parser.parseArgs()
-debugMode = args.debug
-
-// CREATE DIRS
-if (!fs.existsSync('logs')) {
-  fs.mkdirSync('logs')
-}
-
-// EXIT
+// Server events
 onExit(function (code, signal) {
-  updateStatsSync()
-  console.log('Killing memebot')
+  logger.info('Shuting down server')
 })
 
-// DISCORD SERVER
 client.on('ready', () => {
-  console.log('Memebot ready')
-  var cycle = debugMode ? '* * * * *' : '10 * * * *'
-  schedule.scheduleJob(cycle, updateStats)
+  logger.info('Server ready')
+})
+
+client.on('guildCreate', guild => {
+  logger.info('Added to new guild')
+})
+
+client.on('disconnect', (event) => {
+  logger.warn('Server disconnected')
+})
+
+client.on('error', (error) => {
+  logger.error(error)
 })
 
 client.on('message', message => {
@@ -58,7 +46,7 @@ client.on('message', message => {
     if (message == null || message.content.substring(0, 1) !== '!' || message.content.length <= 1) {
       return
     }
-    message.content = trimWhitespace(message.content)
+    message.content = util.trimWhitespace(message.content)
     let words = message.content.substring(1).split(' ')
     if (words[0] === 'mb') {
       words.splice(0, 1)
@@ -82,306 +70,27 @@ client.on('message', message => {
       play(message, words)
     }
   } catch (err) {
-    debug('Memebot crashed')
-    console.error(err)
+    logger.error(err)
   }
 })
 
-client.on('guildCreate', guild => {
-  if (stats['guilds']) {
-    stats['guilds'] += 1
-  } else {
-    stats['guilds'] = 1
-  }
-  debug('Added to new guild')
-})
-
-client.on('disconnect', (event) => {
-  console.log('Memebot disconnect')
-})
-
+// Start server
 client.login(DISCORD_LEECH_TOKEN)
 
-// SYNC STATS
-function updateStats () {
-  memes = readJSON('memes.json')
-  var opts = { wait: 5000 }
-  lockFile.lock('stats.json.lock', opts, function (err) {
-    if (err) {
-      if (err.code === 'EEXIST') {
-        debug('stats.json is already locked', false)
-      } else {
-        console.error(err)
-      }
-      return
-    }
-    debug('locked', false)
-    var savedStats = readJSON('stats.json', {})
-    savedStats = mergeWithStats(savedStats)
-    saveStats(savedStats, function () {
-      lockFile.unlock('stats.json.lock', function (err) {
-        if (err) {
-          fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2), function (err) { if (err) { console.error(err) } })
-          console.error(err)
-        } else {
-          debug('unlocked', false)
-          stats = {}
-        }
-      })
-    })
-  })
-}
-
-function updateStatsSync () {
-  try {
-    lockFile.lockSync('stats.json.lock')
-    debug('locked', false)
-    var savedStats = {}
-    if (fs.existsSync('stats.json')) {
-      savedStats = JSON.parse(fs.readFileSync('stats.json', 'utf8'))
-    }
-    savedStats = mergeWithStats(savedStats)
-    fs.writeFileSync('stats.json', JSON.stringify(savedStats, null, 2))
-    fs.writeFile('stats-backup.json', JSON.stringify(savedStats, null, 2))
-    lockFile.unlockSync('stats.json.lock')
-    debug('unlocked', false)
-    stats = {}
-  } catch (e) {
-    debug(e.message)
-    fs.appendFile('logs/stats-crash.log', JSON.stringify(stats, null, 2))
-    lockFile.unlockSync('stats.json.lock')
-  }
-}
-
-function mergeWithStats (savedStats) {
-  Object.keys(stats).forEach(function (statName) {
-    if (statName === 'guilds') {
-      if (savedStats.hasOwnProperty('guilds')) {
-        savedStats['guilds'] += stats['guilds']
-      } else {
-        savedStats['guilds'] = stats['guilds']
-      }
-    } else if (statName === 'counts') {
-      if (!savedStats['counts']) {
-        savedStats['counts'] = {}
-      }
-      Object.keys(stats['counts']).forEach(function (meme) {
-        if (!savedStats['counts'][meme]) {
-          savedStats['counts'][meme] = 0
-        }
-        savedStats['counts'][meme] += stats['counts'][meme]
-      })
-    }
-  })
-  return savedStats
-}
-
-// LIST
-function list (message, words) {
-  var names = ['```']
-  var listIndex = 0
-  var wordCount = 3
-
-  memes.sort(compareMemes)
-
-  for (let i = 0; i < memes.length; i++) {
-    if (!memes[i]['archived'] && !memes[i]['tags'].includes('suicidal')) {
-      wordCount += memes[i]['name'].length
-      if (wordCount > 1997) {
-        names[listIndex] = names[listIndex].substring(0, names[listIndex].length - 2) + '```'
-        listIndex += 1
-        names[listIndex] = '```'
-        wordCount = 3 + memes[i]['name'].length
-      }
-      names[listIndex] += memes[i]['name']
-      names[listIndex] += ', '
-      wordCount += 2
-    }
-  }
-
-  names[listIndex] = names[listIndex].substring(0, names[listIndex].length - 2) + '```'
-
-  for (let i = 0; i < names.length; i++) {
-    message.channel.send(names[i])
-  }
-}
-
-// HELP
+// Display help message
 function help (message) {
-  const helpText =
-  '```!mb [meme]  \nPlays an audio meme on your currently connected voice channel.\n\n!mb list\nA list of memes from newest to oldest.\n\n!mb random\nPlays a random meme.\n\n!mb help \nThis message.```'
+  const helpText = `\`\`\`
+!mb [meme]
+Plays an audio meme on your currently connected voice channel.
+
+!mb list
+A list of memes from newest to oldest.
+
+!mb random
+Plays a random meme.
+
+!mb help
+This message.
+\`\`\``
   message.channel.send(helpText)
-}
-
-// RANDOM
-function random (message, words) {
-  if (message.member == null || message.member.voiceChannel == null) {
-    message.channel.send('You must join a voice channel to play the dank memes')
-    return
-  }
-  let randomIndex = Math.floor(Math.random() * memes.length)
-  if (memes[randomIndex]['archived']) {
-    random(message, words)
-  } else {
-    let voiceChannel = message.member.voiceChannel
-    if (!isPlaying.hasOwnProperty(voiceChannel.id) ||
-        !isPlaying[voiceChannel.id]) {
-      message.channel.send('Playing ' + memes[randomIndex]['name'])
-    }
-    playMeme(memes[randomIndex], message.member.voiceChannel, true)
-  }
-}
-
-// PLAY
-function play (message, words) {
-  if (message.member == null || message.member.voiceChannel == null) {
-    message.channel.send('You must join a voice channel to play the dank memes')
-    return
-  }
-  let memeInput = words[0]
-  if (words[0].length === 0 && words.length > 1) {
-    memeInput = words[1]
-  }
-  if (memeInput == null) {
-    displayErrorText(message)
-    return
-  }
-  let index = findIndexByCommand(memeInput)
-  if (index === -1 || memes[index]['archived'] || memes[index]['tags'].includes('suicidal')) {
-    var commands = []
-    for (let i = 0; i < memes.length; i++) {
-      commands = commands.concat(memes[i]['commands'])
-    }
-    var matches = stringSimilarity.findBestMatch(memeInput, commands)
-    message.channel.send('Could not find meme by name: `' + words[0] + '`\nDid you mean: `' + matches['bestMatch']['target'] + '`?')
-    return
-  }
-  let meme = memes[index]
-  playMeme(meme, message.member.voiceChannel, false)
-  if (!stats['counts']) {
-    stats['counts'] = {}
-  }
-  if (stats['counts'][meme['name']]) {
-    stats['counts'][meme['name']] += 1
-  } else {
-    stats['counts'][meme['name']] = 1
-  }
-}
-
-function playMeme (meme, voiceChannel, isRandom) {
-  let file = meme['file']
-  let audioMod = meme['audioModifier']
-  if (!isPlaying.hasOwnProperty(voiceChannel.id) ||
-      !isPlaying[voiceChannel.id]) {
-    isPlaying[voiceChannel.id] = true
-    voiceChannel.join()
-      .then(connection => {
-        if (isRandom) {
-          debug('Randomly playing ' + file)
-        } else {
-          debug('Playing ' + file)
-        }
-        const dispatcher = connection.playFile('audio/' + file, {
-          volume: 0.50 * audioMod
-        })
-        dispatcher.on('end', () => {
-          debug('Stopped playing ' + file)
-          voiceChannel.leave()
-          isPlaying[voiceChannel.id] = false
-        })
-      })
-      .catch(function (e) {
-        if (isRandom) {
-          debug('Failed to randomly play ' + file)
-        } else {
-          debug('Failed to play ' + file)
-        }
-        voiceChannel.leave()
-        console.error(e)
-      })
-  }
-}
-
-// HELPERS
-function displayErrorText (message) {
-  let errorText =
-  'You did something wrong.\nType **!help** my adult son.'
-  message.channel.send(errorText)
-}
-
-function trimWhitespace (str) {
-  return str.replace(/\s+/g, ' ').trim()
-}
-
-function findIndexByCommand (inputCommand) {
-  if (!inputCommand) {
-    return -1
-  }
-  for (let i = 0; i < memes.length; i++) {
-    let meme = memes[i]
-    for (let j = 0; j < meme['commands'].length; j++) {
-      let command = meme['commands'][j]
-      if (inputCommand.toLowerCase() === command.toLowerCase()) {
-        return i
-      }
-    }
-  }
-  return -1
-}
-
-function compareMemes (a, b) {
-  return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
-}
-
-// function compareMemesNewest (a, b) {
-//   return new Date(b['dateAdded']) - new Date(a['dateAdded'])
-// }
-
-// function compareMemesOldest (a, b) {
-//   return new Date(a['dateAdded']) - new Date(b['dateAdded'])
-// }
-
-function saveStats (totalStats, callback) {
-  fs.writeFile('stats.json', JSON.stringify(totalStats, null, 2), (err) => {
-    if (err) throw err
-    debug('Saved stats.json', false)
-    fs.writeFile('stats-backup.json', JSON.stringify(totalStats, null, 2), (err) => {
-      if (err) throw err
-      debug('Saved stats-backup.json', false)
-      callback()
-    })
-  })
-}
-
-function readJSON (file, defaultValue = []) {
-  try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'))
-  } catch (e) {
-    console.error(e.message)
-    return defaultValue
-  }
-}
-
-// DEBUG
-function debug (msg, shouldLog = true) {
-  if (debugMode) {
-    console.log(msg)
-  }
-  if (shouldLog) {
-    let d = new Date()
-    let timeString = d.getFullYear() + '-' + formatTime(d.getMonth() + 1) + '-' + formatTime(d.getDate()) + ' ' + formatTime(d.getHours()) + ':' + formatTime(d.getMinutes()) + ':' + formatTime(d.getSeconds())
-    msg = '[' + timeString + '] ' + msg + '\n'
-    fs.appendFile('logs/debug-leech.log', msg, function (err) {
-      if (err) {
-        return console.log(err)
-      }
-    })
-  }
-}
-
-function formatTime (time) {
-  if (time <= 9) {
-    time = '0' + time
-  }
-  return time
 }

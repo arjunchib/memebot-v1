@@ -1,7 +1,8 @@
 .sync-config.cson
 old_index.js
 logs/
-audio/
+data/
+assets/
 node_modules/
 graphics/
 memes.json

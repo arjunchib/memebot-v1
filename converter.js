@@ -1,19 +1,18 @@
 var fs = require('fs')
 
-var memes = JSON.parse(fs.readFileSync('memes.json', 'utf8'))
-// var d = new Date()
+require('dotenv').config()
 
-for (let i = 0; i < memes.length; i++) {
-  // Code to modify memes.json
-  memes[i]['tags'] = []
-}
-saveMemes()
+// const Meme = require('./models/meme.js')
+var counts = JSON.parse(fs.readFileSync('./data/counts.json', 'utf8'))
+// var memes = JSON.parse(fs.readFileSync('./data/memes.json', 'utf8'))
 
-function compareMemes (a, b) {
-  return a['name'].toLowerCase().localeCompare(b['name'].toLowerCase())
-}
+// for (let data of memes) {
+//   let meme = new Meme(data)
+//   meme.save()
+// }
 
-function saveMemes () {
-  memes.sort(compareMemes)
-  fs.writeFileSync('memes-converted.json', JSON.stringify(memes, null, 2))
+let total = 0
+for (let name of Object.keys(counts)) {
+  total += counts[name]
 }
+console.log(total)
