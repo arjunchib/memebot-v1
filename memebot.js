@@ -61,9 +61,7 @@ schedule.scheduleJob('5 * * * *', function () {
     if (counts.hasOwnProperty(name)) {
       let meme = Meme.findByName(name)
       let count = counts[name]
-      logger.info(count)
       if (meme == null) {
-        logger.warn(`Could not count plays of meme ${name} as it does not exist`)
         continue
       }
       meme.setPlayCount(count)

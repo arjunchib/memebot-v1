@@ -184,7 +184,10 @@ Meme.prototype.play = function (message, voiceChannel, isRandom = false) {
         logger.warn(`Failed to play ${meme.get('name')}`)
         logger.error(err)
         voiceChannel.leave()
+        isPlaying = false
       })
+  } else {
+    logger.warn(`Failed to play ${meme.get('name')} as a meme is already playing`)
   }
 }
 
