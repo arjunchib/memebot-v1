@@ -19,7 +19,8 @@ util.makeDirectory('./data/memes')
 // Variables
 var cache = new Map()
 var commandLookup = io.readJSON(commandLookupFileName) || Object.create(null)
-var isPlaying = false
+var activeVoiceChannels = new Set([])
+var activeGuilds = new Set([])
 
 // Schema
 var memeDefaults = {
@@ -167,8 +168,10 @@ Meme.prototype.play = function (message, voiceChannel, isRandom = false) {
   logger.info(`Playing ${this.data.name}`)
   var meme = this
   let file = `${audioDirName}/${this.data.file}`
-  if (!isPlaying && !io.blockedFiles.has(file)) {
-    isPlaying = true
+  if (!activeVoiceChannels.has(voiceChannel) && !activeGuilds.has(voiceChannel.guild) &&
+  !io.blockedFiles.has(file)) {
+    activeVoiceChannels.add(voiceChannel)
+    activeGuilds.add(voiceChannel.guild)
     voiceChannel.join()
       .then(connection => {
         logger.play(meme, message, isRandom)
@@ -177,14 +180,16 @@ Meme.prototype.play = function (message, voiceChannel, isRandom = false) {
         })
         dispatcher.on('end', () => {
           voiceChannel.leave()
-          isPlaying = false
+          activeVoiceChannels.delete(voiceChannel)
+          activeGuilds.delete(voiceChannel.guild)
         })
       })
       .catch(function (err) {
         logger.warn(`Failed to play ${meme.get('name')}`)
         logger.error(err)
         voiceChannel.leave()
-        isPlaying = false
+        activeVoiceChannels.delete(voiceChannel)
+        activeGuilds.delete(voiceChannel.guild)
       })
   } else {
     logger.warn(`Failed to play ${meme.get('name')} as a meme is already playing`)
