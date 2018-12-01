@@ -38,7 +38,11 @@ module.exports = function (message, words, defaultChannel = null) {
     if (meme == null) {
       let similarMeme = Meme.findSimilarName(name)
       logger.info(`${message.author.username} tried to play meme that does not exist`)
-      message.channel.send(`Could not find meme by name \`${name}\`\nDid you mean \`${similarMeme.get('name')}\`?`)
+      if (name != null && name !== ' ' && name !== '') {
+        message.channel.send(`Could not find meme by name \`${name}\`\nDid you mean \`${similarMeme.get('name')}\`?`)
+      } else {
+        message.channel.send(`Could not find meme with no name`)
+      }
       return
     }
     meme.play(message, voiceChannel)
