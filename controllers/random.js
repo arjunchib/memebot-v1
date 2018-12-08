@@ -35,4 +35,5 @@ module.exports = function (message, words, defaultChannel = null) {
     return
   }
   meme.play(message, voiceChannel, true)
+  message.channel.send(`Playing ${meme.name}`)
 }
