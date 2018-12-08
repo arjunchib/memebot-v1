@@ -154,13 +154,15 @@ Meme.prototype.save = function () {
 
 // Remove from file
 Meme.prototype.delete = function () {
-  cache.delete(this.data.name.toLowerCase())
   let memeFile = `${storageDirName}/${this.data.name}.json`
-  io.delete(memeFile)
+  let audioFile = `${audioDirName}/${this.data.file}`
   for (let command of this.data.commands) {
     delete commandLookup[command.toLowerCase()]
   }
+  io.delete(memeFile)
+  io.delete(audioFile)
   io.saveJSON(commandLookup, commandLookupFileName)
+  cache.delete(this.data.name.toLowerCase())
 }
 
 // Play meme on a voice channel
