@@ -54,19 +54,6 @@ function validate (data) {
   }
 }
 
-// Populate cache
-for (let file of fs.readdirSync(storageDirName)) {
-  if (util.getFileExtension(file) === 'json') {
-    let path = `${storageDirName}/${file}`
-    let data = sanitize(io.readJSON(path))
-    if (validate(data)) {
-      cache.set(data.name.toLowerCase(), data)
-    } else {
-      logger.warn(`Could not enter ${file} into cache as this meme is invalid`)
-    }
-  }
-}
-
 // Constructor
 var Meme = function (data) {
   this.data = sanitize(data)
@@ -251,6 +238,25 @@ Meme.all = function () {
 Meme.count = function () {
   return cache.size
 }
+
+// Repopulate cache and command lookup
+Meme.repopulate = function () {
+  commandLookup = io.readJSON(commandLookupFileName) || Object.create(null)
+  for (let file of fs.readdirSync(storageDirName)) {
+    if (util.getFileExtension(file) === 'json') {
+      let path = `${storageDirName}/${file}`
+      let data = sanitize(io.readJSON(path))
+      if (validate(data)) {
+        cache.set(data.name.toLowerCase(), data)
+      } else {
+        logger.warn(`Could not enter ${file} into cache as this meme is invalid`)
+      }
+    }
+  }
+}
+
+// Initial cache population
+Meme.repopulate()
 
 // Export module
 module.exports = Meme

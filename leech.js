@@ -1,9 +1,13 @@
 var Discord = require('discord.js')
 var onExit = require('signal-exit')
+const schedule = require('node-schedule')
 
 // Environment variables
 require('dotenv').config()
 const DISCORD_LEECH_TOKEN = process.env.DISCORD_LEECH_TOKEN
+
+// Models
+const Meme = require('./models/meme.js')
 
 // Controllers
 const list = require('./controllers/list.js')
@@ -76,6 +80,12 @@ client.on('message', message => {
 
 // Start server
 client.login(DISCORD_LEECH_TOKEN)
+
+// Repopulate meme cache every 10 minutes
+schedule.scheduleJob('*/10 * * * *', function () {
+  logger.info('Repopulating meme cache')
+  Meme.repopulate()
+})
 
 // Display help message
 function help (message) {
